@@ -46,6 +46,15 @@ module.exports = function (macro) {
             assert.isTrue(body.verified);
           }
         },
+      },
+      'Verifying non-existent user': {
+        topic: function (body) {
+          macro.get('/users/god/verify/' + body.verification_token, null, this.callback);
+        },
+        'should return 404': macro.status(404),
+        'should return not found': function (err, res, body) {
+          assert.deepEqual(body, {message: 'Not found'});
+        }
       }
     })
   };

@@ -1,4 +1,5 @@
 var assert = require('assert')
+  , request = require('request')
   , nano = require('nano')('http://localhost:5984')
   , redis = require('redis').createClient()
   , vows = require('vows');
@@ -80,6 +81,21 @@ vows.describe('confy').addBatch({
       'should return not found': function (err, res, body) {
         assert.deepEqual(body, {'message':'Not found'});
       }
+    }
+  }
+}).addBatch({
+  'OPTIONS method': {
+    topic: function () {
+      request({
+        url: 'http://localhost:5000/',
+        method: 'OPTIONS'
+      }, this.callback);
+    },
+    'should return 200': macro.status(200),
+    'should have CORS headers': function (err, res, body) {
+      assert.deepEqual(res.headers['access-control-allow-origin'], 'http://localhost:8000');
+      assert.deepEqual(res.headers['access-control-allow-methods'], 'OPTIONS,GET,POST,PATCH,PUT,DELETE');
+      assert.deepEqual(res.headers['access-control-allow-headers'], 'Content-Type, Authorization');
     }
   }
 }).addBatch(require('./users/create')(macro))
