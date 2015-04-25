@@ -38,39 +38,26 @@ module.exports = function (app, db) {
     });
   });
 
-  app.post('/user/forgot', function (req, res, next) {
+  app.post('/users/:user/forgot/:token', function (req, res, next) {
+    if (req.user.reset_token !== req.params.token || !req.user.reset_expire || req.user.reset_expire < new Date().getTime()) {
+      res.status(400);
+      return res.json({ message: 'Invalid reset password token' });
+    }
 
-    // Search for existing user with associated reset token
-    db.view('users', 'reset_token', {keys: [req.body.reset_token]}, function (err, body) {
+    delete req.user.reset_token;
+    delete req.user.reset_expire;
+
+    req.user.password = cryptPass(req.body.password);
+
+    db.insert(user, user._id, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows.length !== 1) {
-        return app.errors.notfound(res);
-      }
+      if (body.ok) {
+        app.mail.reset_password(user.email, user, app.errors.capture());
+        app.analytics.track({ userId: user.username, event: 'Reset password' });
 
-      var user = body.rows[0].value;
-
-      if (!user.reset_expire || user.reset_expire < new Date().getTime()) {
-        return app.errors.forbidden(res);
-      }
-
-      // Update the user
-      delete user.reset_token;
-      delete user.reset_expire;
-
-      user.password = cryptPass(req.body.password);
-
-      // Update the database
-      db.insert(user, user._id, function (err, body) {
-        if (err) return next(err);
-
-        if (body.ok) {
-          app.analytics.track({ userId: user.username, event: 'Reset password' });
-          app.mail.reset_password(user.email, user, app.errors.capture());
-
-          res.sendStatus(204);
-        } else next();
-      });
+        res.sendStatus(204);
+      } else next();
     });
   });
 };
