@@ -2,7 +2,7 @@ module.exports = function (app, db) {
 
   app.param('user', function (req, res, next, user) {
     db.get('users/' + user, function (err, body) {
-      if (err && err.reason != 'missing') {
+      if (err && err.reason !== 'missing') {
         return next(err);
       }
 

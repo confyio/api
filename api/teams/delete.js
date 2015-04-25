@@ -6,8 +6,8 @@ module.exports = function (app, db) {
       , team = app.utils.idify(req.team.name);
 
     // If team is the default team
-    if (team == 'owners') {
-      return app.errors.validation(res, [{ field: 'team', code: 'forbidden' }])
+    if (team === 'owners') {
+      return app.errors.validation(res, [{ field: 'team', code: 'forbidden' }]);
     }
 
     // Update projects

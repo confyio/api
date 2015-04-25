@@ -14,7 +14,7 @@ module.exports = function (app, db) {
     db.view('users', 'email', {keys: [req.params.email]}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows.length != 1) {
+      if (body.rows.length !== 1) {
         return app.errors.notfound(res);
       }
 
@@ -44,7 +44,7 @@ module.exports = function (app, db) {
     db.view('users', 'reset_token', {keys: [req.body.reset_token]}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows.length != 1) {
+      if (body.rows.length !== 1) {
         return app.errors.notfound(res);
       }
 

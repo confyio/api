@@ -41,13 +41,13 @@ module.exports = function (app, db) {
         });
       });
     });
-  }
+  };
 
   // Delete an org
   app.delete('/orgs/:org', app.auth.owner, app.auth.noHeroku, function (req, res, next) {
     // If team is the default team
-    if (app.utils.slug(req.org) == req.user.username) {
-      return app.errors.validation(res, [{ field: 'org', code: 'forbidden' }])
+    if (app.utils.slug(req.org) === req.user.username) {
+      return app.errors.validation(res, [{ field: 'org', code: 'forbidden' }]);
     }
 
     app.utils.deleteOrg([], req.org, function (err) {

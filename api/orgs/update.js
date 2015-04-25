@@ -9,7 +9,7 @@ module.exports = function (app, db) {
 
     if (!validator.isEmail(req.body.email)) {
       return app.errors.validation(res, [{ field: 'email', code: 'invalid' }]);
-    };
+    }
 
     db.insert(req.org, req.org._id, function (err, body) {
       if (err) return next(err);

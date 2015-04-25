@@ -13,17 +13,17 @@ module.exports = function (app, db) {
     var errs = app.utils.need(req, ['username', 'email', 'password'])
       , user = req.body.username;
 
-    if (typeof user != 'string' || user.length < 3 || user.length > 15 || user.match(/[a-z0-9]*/i)[0] != user) {
+    if (typeof user !== 'string' || user.length < 3 || user.length > 15 || user.match(/[a-z0-9]*/i)[0] !== user) {
       errs.push({ field: 'username', code: 'invalid' });
     }
 
-    if (typeof req.body.password != 'string' || req.body.password.length < 6) {
+    if (typeof req.body.password !== 'string' || req.body.password.length < 6) {
       errs.push({ field: 'password', code: 'insecure' });
     }
 
     if (!validator.isEmail(req.body.email)) {
       errs.push({ field: 'email', code: 'invalid' });
-    };
+    }
 
     if (errs.length > 0) {
       return app.errors.validation(res, errs);

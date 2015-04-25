@@ -6,8 +6,6 @@ module.exports = function (app, db) {
       , project = app.utils.idify(req.project.name);
 
     db.view('envs', 'project', {keys:[org + '/' + project]}, function (err, body) {
-      var configs = [];
-
       var docs = body.rows.map(function (row) {
         row.value._deleted = true;
         return row.value;

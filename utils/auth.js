@@ -6,23 +6,23 @@ var authorization = function (req) {
     token: null
   };
 
-  if (typeof req.headers.authorization == 'string') {
-    auth = req.headers.authorization.substr(6).trim()
+  if (typeof req.headers.authorization === 'string') {
+    auth = req.headers.authorization.substr(6).trim();
     type = req.headers.authorization.substr(0, 5);
   }
 
-  if (type.toLowerCase() == 'basic') {
+  if (type.toLowerCase() === 'basic') {
     auth = new Buffer(auth, 'base64').toString();
 
     result.basic = {
       username: auth.substr(0, auth.indexOf(':')),
       password: auth.substr(auth.indexOf(':') + 1)
     };
-  } else if (type.toLowerCase() == 'token') {
+  } else if (type.toLowerCase() === 'token') {
     result.token = auth;
   }
 
-  if (typeof req.query.access_token == 'string') {
+  if (typeof req.query.access_token === 'string') {
     result.token = req.query.access_token;
   }
 
@@ -38,7 +38,7 @@ module.exports = function (app, db) {
     if (auth.basic !== null) {
       // Fetching user with username
       return db.get('users/' + auth.basic.username, function (err, body) {
-        if (err && err.reason != 'missing') {
+        if (err && err.reason !== 'missing') {
           return next(err);
         }
 
@@ -75,7 +75,7 @@ module.exports = function (app, db) {
         db.view('users', 'token', {keys: [auth.token]}, function (err, body) {
           if (err) return next(err);
 
-          if (body.rows.length != 1) {
+          if (body.rows.length !== 1) {
             return app.errors.auth(res);
           }
 
@@ -92,7 +92,7 @@ module.exports = function (app, db) {
     }
 
     return app.errors.auth(res);
-  }
+  };
 
   app.auth.owner = function (req, res, next) {
     app.auth.user(req, res, function (err) {
@@ -102,13 +102,13 @@ module.exports = function (app, db) {
         return app.errors.notfound(res);
       }
 
-      if (req.org.owner != req.user.username) {
+      if (req.org.owner !== req.user.username) {
         return app.errors.auth(res);
       }
 
       return next();
     });
-  }
+  };
 
   app.auth.project = function (req, res, next) {
     app.auth.user(req, res, function (err) {
@@ -120,7 +120,7 @@ module.exports = function (app, db) {
 
       return next();
     });
-  }
+  };
 
   app.auth.team = function (req, res, next) {
     app.auth.user(req, res, function (err) {
@@ -131,18 +131,18 @@ module.exports = function (app, db) {
       }
 
       return next();
-    })
-  }
+    });
+  };
 
   app.auth.heroku = function (req, res, next) {
     var auth = authorization(req);
 
-    if (auth.basic === null || auth.basic.username != 'confy' || auth.basic.password != app.get('addonkey')) {
+    if (auth.basic === null || auth.basic.username !== 'confy' || auth.basic.password !== app.get('addonkey')) {
       return app.errors.auth(res);
     }
 
     return next();
-  }
+  };
 
   app.auth.noHeroku = function (req, res, next) {
     if (req.user.heroku !== undefined && req.user.heroku) {
@@ -150,7 +150,7 @@ module.exports = function (app, db) {
     }
 
     return next();
-  }
+  };
 
   app.auth.configHeroku = function (req, res, next) {
     if (req.user.heroku === undefined || !req.user.heroku) {
@@ -160,7 +160,7 @@ module.exports = function (app, db) {
     var id = 'orgs/' + req.user.username + '/projects/app/envs/production';
 
     db.get(id, function (err, body) {
-      if (err && err.reason != 'missing') {
+      if (err && err.reason !== 'missing') {
         return next(err);
       }
 
@@ -171,5 +171,5 @@ module.exports = function (app, db) {
 
       return app.errors.notfound(res);
     });
-  }
+  };
 };

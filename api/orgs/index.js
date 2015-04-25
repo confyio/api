@@ -3,7 +3,7 @@ module.exports = function (app, db) {
   // Org param
   app.param('org', function (req, res, next, org) {
     db.get('orgs/' + org, function (err, body) {
-      if (err && err.reason != 'missing' && err.reason != 'deleted') {
+      if (err && err.reason !== 'missing' && err.reason !== 'deleted') {
         return next(err);
       }
 

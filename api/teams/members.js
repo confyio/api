@@ -7,7 +7,7 @@ module.exports = function (app, db) {
     var errs = app.utils.need(req, ['user']);
     var user = req.body.user;
 
-    if (typeof user != 'string' || user.match(/[a-z0-9]*/i)[0] != user) {
+    if (typeof user !== 'string' || user.match(/[a-z0-9]*/i)[0] !== user) {
       errs.push({ field: 'user', code: 'invalid' });
     }
 
@@ -17,7 +17,7 @@ module.exports = function (app, db) {
     }
 
     return false;
-  }
+  };
 
   var update = function (docs, req, res, next) {
     docs.push(req.team);
@@ -30,7 +30,7 @@ module.exports = function (app, db) {
       app.utils.shield(req.team, ['_rev']);
       res.json(req.team);
     });
-  }
+  };
 
   app.get('/orgs/:orgname/teams/:team/member', app.auth.team, function (req, res, next) {
     db.view('users', 'username', {keys: Object.keys(req.team.users)}, function (err, body) {
@@ -59,7 +59,7 @@ module.exports = function (app, db) {
 
     // If user is the default user
     if (req.org.owner == user) {
-      return app.errors.validation(res, [{ field: 'user', code: 'forbidden' }])
+      return app.errors.validation(res, [{ field: 'user', code: 'forbidden' }]);
     }
 
     // If user is not a member
@@ -104,7 +104,7 @@ module.exports = function (app, db) {
     // Check if user exists
     db.get('users/' + user, function (err, body) {
       if (err) {
-        if (err.message == 'missing') {
+        if (err.message === 'missing') {
           return app.errors.validation(res, [{ field: 'user', code: 'does_not_exist' }]);
         } else return next(err);
       }

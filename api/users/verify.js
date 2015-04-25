@@ -5,7 +5,7 @@ module.exports = function (app, db) {
 
   // Verify a user
   app.get('/users/:user/verify/:token', function (req, res, next) {
-    if (req.user.verification_token != req.params.token) {
+    if (req.user.verification_token !== req.params.token) {
       res.status(400);
       return res.json({ message: 'Invalid verification token' });
     }

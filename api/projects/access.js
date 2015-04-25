@@ -7,7 +7,7 @@ module.exports = function (app, db) {
     var errs = app.utils.need(req, ['team']);
     var team = req.body.team;
 
-    if (typeof team != 'string' || team.match(/[a-z0-9][a-z0-9-]*[a-z0-9]/i)[0] != team) {
+    if (typeof team !== 'string' || team.match(/[a-z0-9][a-z0-9-]*[a-z0-9]/i)[0] !== team) {
       errs.push({ field: 'team', code: 'invalid' });
     }
 
@@ -17,7 +17,7 @@ module.exports = function (app, db) {
     }
 
     return false;
-  }
+  };
 
   var update = function (req, res, next) {
     db.insert(req.project, req.project._id, function (err, body) {
@@ -29,7 +29,7 @@ module.exports = function (app, db) {
         res.json(req.project);
       } else next();
     });
-  }
+  };
 
   app.get('/orgs/:orgname/projects/:project/access', app.auth.project, function (req, res, next) {
     var org = app.utils.slug(req.org);
@@ -66,7 +66,7 @@ module.exports = function (app, db) {
       , team = app.utils.idify(req.body.team);
 
     // If team is the default team
-    if (team == 'owners') {
+    if (team === 'owners') {
       return app.errors.validation(res, [{ field: 'team', code: 'forbidden'}]);
     }
 
@@ -104,7 +104,7 @@ module.exports = function (app, db) {
     // Check if team exists
     db.get('orgs/' + org + '/teams/' + team, function (err, body) {
       if (err) {
-        if (err.message == 'missing') {
+        if (err.message === 'missing') {
           return app.errors.validation(res, [{ field: 'team', code: 'does_not_exist' }]);
         } else return next(err);
       }

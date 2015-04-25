@@ -5,7 +5,7 @@ module.exports = function (app, db) {
     var id = 'orgs/' + app.utils.slug(req.org) + '/projects/' + app.utils.idify(req.project.name) + '/envs/' + env;
 
     db.get(id, function (err, body) {
-      if (err && err.reason != 'missing' && err.reason != 'deleted') {
+      if (err && err.reason !== 'missing' && err.reason !== 'deleted') {
         return next(err);
       }
 

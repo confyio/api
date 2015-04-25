@@ -26,7 +26,7 @@ module.exports = function (app, db) {
         res.json(req.user);
       } else next();
     });
-  }
+  };
 
   // Update an user
   app.patch('/user', app.auth.user, function (req, res, next) {
@@ -38,10 +38,10 @@ module.exports = function (app, db) {
 
     if (!validator.isEmail(req.body.email)) {
       return app.errors.validation(res, [{ field: 'email', code: 'invalid' }]);
-    };
+    }
 
     // If updating email, send verification email
-    if (req.body.email && req.body.email != req.user.email) {
+    if (req.body.email && req.body.email !== req.user.email) {
       req.body.verified = false;
       req.body.verification_token = crypto.randomBytes(20).toString('hex');
       req.body.verify_new_email = true;

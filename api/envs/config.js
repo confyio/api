@@ -26,7 +26,7 @@ var update = function (app, db) {
       } else return next();
     });
   };
-}
+};
 
 module.exports = function (app, db) {
 

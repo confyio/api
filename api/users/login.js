@@ -21,7 +21,7 @@ var login = function (app, remember, req, res, next, callback) {
       if (callback) return callback();
     } else next();
   });
-}
+};
 
 module.exports = function (app, db) {
 
@@ -57,8 +57,8 @@ module.exports = function (app, db) {
     var token = req.body.id + ':' + app.get('addonsso') + ':' + req.body.timestamp
       , hash = crypto.createHash('sha1').update(token).digest('hex');
 
-    if (req.body.token != hash || (Date.now()/1000 - 300) > parseInt(req.body.timestamp)) {
-      return res.sendStatus(403);
+    if (req.body.token !== hash || (Date.now()/1000 - 300) > parseInt(req.body.timestamp)) {
+      return app.errors.forbidden(res);
     }
 
     db.get('users/' + req.body.id, function (err, user) {
@@ -80,7 +80,6 @@ module.exports = function (app, db) {
       });
     });
   });
-
 };
 
 module.exports.login = login;

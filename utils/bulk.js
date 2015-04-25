@@ -71,5 +71,5 @@ module.exports = function (app) {
     tmp.docs = tmp.docs.concat(app.bulk.project(project, tmp.docs[1]).docs);
 
     return tmp;
-  }
-}
+  };
+};
