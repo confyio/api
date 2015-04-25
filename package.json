@@ -25,9 +25,12 @@
   },
   "devDependencies": {
     "vows": "~0.7.0",
-    "request": "2.54.x"
+    "request": "2.54.x",
+    "istanbul": "0.3.x"
   },
   "scripts": {
-    "test": "./node_modules/.bin/vows test/test.js --spec"
+    "test": "vows test/test.js --spec",
+    "cover": "istanbul cover vows -- test/test.js --spec",
+    "codeclimate": "codeclimate < coverage/lcov.info"
   }
 }

@@ -4,3 +4,7 @@ node_js:
 services:
   - couchdb
   - redis-server
+script: npm run cover
+after_script:
+  - npm install -g codeclimate-test-reporter
+  - npm run codeclimate
