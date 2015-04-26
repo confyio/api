@@ -94,13 +94,21 @@ module.exports = function (app, db) {
     return app.errors.auth(res);
   };
 
-  app.auth.owner = function (req, res, next) {
+  app.auth.org = function (req, res, next) {
     app.auth.user(req, res, function (err) {
       if (err) return next(err);
 
       if (req.org.users[req.user.username] === undefined) {
         return app.errors.notfound(res);
       }
+
+      return next();
+    });
+  };
+
+  app.auth.owner = function (req, res, next) {
+    app.auth.org(req, res, function (err) {
+      if (err) return next(err);
 
       if (req.org.owner !== req.user.username) {
         return app.errors.auth(res);

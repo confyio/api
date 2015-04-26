@@ -36,17 +36,15 @@ module.exports = function (app, db) {
     db.view('users', 'username', {keys: Object.keys(req.team.users)}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows) {
-        body = body.rows.map(function (row) {
-          app.utils.shield(row.value, [
-            'password', 'access_token', 'verification_token', 'verify_new_email', '_rev'
-          ]);
+      var members = body.rows.map(function (row) {
+        app.utils.shield(row.value, [
+          'password', 'access_token', 'verification_token', 'verify_new_email', '_rev'
+        ]);
 
-          return row.value;
-        });
+        return row.value;
+      });
 
-        res.json(body);
-      } else next();
+      res.json(members);
     });
   });
 

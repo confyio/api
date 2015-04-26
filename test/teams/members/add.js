@@ -22,7 +22,7 @@ module.exports = function (macro) {
       'Adding member to team': {
         topic: function () {
           macro.post('/orgs/confyio/teams/engineering/member', {
-            user: 'zdenek', random: 'u2e83'
+            user: 'mdeiters', random: 'u2e83'
           }, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
         'should return 200': macro.status(200),
@@ -37,21 +37,21 @@ module.exports = function (macro) {
           assert.isUndefined(body.random);
         },
         'should return users array': function (err, res, body) {
-          assert.deepEqual(body.users, ['pksunkara', 'zdenek']);
+          assert.deepEqual(body.users, ['pksunkara', 'mdeiters']);
         },
         'should update the team doc and it': macro.doc('orgs/confyio/teams/engineering', {
           'should have new user in users list': function (err, body) {
-            assert.isTrue(body.users['zdenek']);
+            assert.isTrue(body.users['mdeiters']);
           }
         }),
         'should update the org doc and it': macro.doc('orgs/confyio', {
           'should increment the count for the user': function (err, body) {
-            assert.equal(body.users['zdenek'], 1);
+            assert.equal(body.users['mdeiters'], 1);
           }
         }),
         'should update the project doc and it': macro.doc('orgs/confyio/projects/main', {
           'should increment the count for the user': function (err, body) {
-            assert.equal(body.users['zdenek'], 1);
+            assert.equal(body.users['mdeiters'], 1);
           }
         })
       },
@@ -78,7 +78,7 @@ module.exports = function (macro) {
       'Adding member to team with member': {
         topic: function () {
           macro.post('/orgs/confyio/teams/consultants/member', {
-            user: 'zdenek',
+            user: 'mdeiters',
           }, {user: 'vanstee', pass: 'password'}, this.callback);
         },
         'should return 401': macro.status(401),
@@ -94,7 +94,7 @@ module.exports = function (macro) {
       'Adding member to team with no access': {
         topic: function () {
           macro.post('/orgs/confyio/teams/consultants/member', {
-            user: 'zdenek',
+            user: 'mdeiters',
           }, {user: 'jsmith', pass: 'secret'}, this.callback);
         },
         'should return 404': macro.status(404),

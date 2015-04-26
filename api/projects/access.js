@@ -41,21 +41,18 @@ module.exports = function (app, db) {
     db.view('teams', 'name', {keys: keys}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows) {
-        body = body.rows.map(function (row) {
-          if (row.value.users[req.user.username] === undefined) {
-            return;
-          }
+      var teams = body.rows.map(function (row) {
+        if (row.value.users[req.user.username] === undefined) {
+          return;
+        }
 
-          app.utils.shield(row.value, ['_rev']);
-          row.value.users = Object.keys(row.value.users);
-          return row.value;
-        });
+        app.utils.shield(row.value, ['_rev']);
+        row.value.users = Object.keys(row.value.users);
+        return row.value;
+      });
 
-        body = app.utils.compact(body);
-
-        res.json(body);
-      } else next();
+      teams = app.utils.compact(teams);
+      res.json(teams);
     });
   });
 

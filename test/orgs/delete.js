@@ -34,7 +34,7 @@ module.exports = function (macro) {
       },
       'Deleting org with member': {
         topic: function () {
-          macro.delete('/orgs/confyio', {}, {user: 'vanstee', pass: 'password'}, this.callback);
+          macro.delete('/orgs/confyio', {}, {user: 'shea', pass: 'password'}, this.callback);
         },
         'should return 401': macro.status(401),
         'should return bad credentials': function (err, res, body) {

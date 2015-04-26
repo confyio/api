@@ -13,7 +13,7 @@ module.exports = function (macro) {
       'Removing member from team': {
         topic: function () {
           macro.delete('/orgs/confyio/teams/engineering/member', {
-            user: 'zdenek', random: 'u2e83'
+            user: 'mdeiters', random: 'u2e83'
           }, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
         'should return 200': macro.status(200),
@@ -32,17 +32,17 @@ module.exports = function (macro) {
         },
         'should update the team doc and it': macro.doc('orgs/confyio/teams/engineering', {
           'should not have user in users list': function (err, body) {
-            assert.isUndefined(body.users['zdenek']);
+            assert.isUndefined(body.users['mdeiters']);
           }
         }),
         'should update the org doc and it': macro.doc('orgs/confyio', {
           'should decrement the count for the user': function (err, body) {
-            assert.isUndefined(body.users['zdenek']);
+            assert.isUndefined(body.users['mdeiters']);
           }
         }),
         'should update the project doc and it': macro.doc('orgs/confyio/projects/main', {
           'should decrement the count for the user': function (err, body) {
-            assert.isUndefined(body.users['zdenek']);
+            assert.isUndefined(body.users['mdeiters']);
           }
         })
       },

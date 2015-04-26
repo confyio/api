@@ -5,14 +5,12 @@ module.exports = function (app, db) {
     db.view('envs', 'project', {keys: [app.utils.slug(req.org) + '/' + app.utils.idify(req.project.name)]}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows) {
-        body = body.rows.map(function (row) {
-          app.utils.shield(row.value, ['config', 'versions', '_rev']);
-          return row.value;
-        });
+      var envs = body.rows.map(function (row) {
+        app.utils.shield(row.value, ['config', 'versions', '_rev']);
+        return row.value;
+      });
 
-        res.json(body);
-      } else next();
+      res.json(envs);
     });
   });
 };

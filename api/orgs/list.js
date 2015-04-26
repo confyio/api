@@ -5,14 +5,12 @@ module.exports = function (app, db) {
     db.view('orgs', 'user', {keys: [req.user.username]}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows) {
-        body = body.rows.map(function (row) {
-          app.utils.shield(row.value, ['users', '_rev']);
-          return row.value;
-        });
+      var orgs = body.rows.map(function (row) {
+        app.utils.shield(row.value, ['users', '_rev']);
+        return row.value;
+      });
 
-        res.json(body);
-      } else next();
+      res.json(orgs);
     });
   });
 };

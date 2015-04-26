@@ -8,15 +8,13 @@ module.exports = function (app, db) {
     db.view('projects', 'team', {keys: [org + '/' + team]}, function (err, body) {
       if (err) return next(err);
 
-      if (body.rows) {
-        body = body.rows.map(function (row) {
-          app.utils.shield(row.value, ['users', '_rev']);
-          row.value.teams = Object.keys(row.value.teams);
-          return row.value;
-        });
+      var projects = body.rows.map(function (row) {
+        app.utils.shield(row.value, ['users', '_rev']);
+        row.value.teams = Object.keys(row.value.teams);
+        return row.value;
+      });
 
-        res.json(body);
-      } else next();
+      res.json(projects);
     });
   });
 };

@@ -30,7 +30,6 @@
   },
   "scripts": {
     "test": "vows test/test.js --spec",
-    "cover": "istanbul cover vows -- test/test.js --spec",
-    "codeclimate": "codeclimate < coverage/lcov.info"
+    "cover": "istanbul cover vows -- test/test.js --spec"
   }
 }

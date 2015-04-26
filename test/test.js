@@ -56,7 +56,7 @@ vows.describe('confy').addBatch({
       redis.flushall(function () {
         redis.mset([
           'confy_43fb9585328895005ca74bb33a1c46db5b835f2d', '{"_id":"users/pksunkara","username":"pksunkara","fullname":"Pavan Kumar Sunkara","email":"pavan.sss1991@gmail.com","type":"user","verified":true}',
-          'confy_fad47f775369e976bcee4cdd1a6b263c3b7d1ade', '{"_id":"users/zdenek","username":"zdenek","fullname":"Zdenek Nemec","email":"z@apiary.io","type":"user","verified":true}'
+          'confy_fad47f775369e976bcee4cdd1a6b263c3b7d1ade', '{"_id":"users/mdeiters","username":"mdeiters","fullname":"Matt Deiters","email":"mdeiters@gmail.com","type":"user","verified":true}'
         ], self.callback);
       });
     },
