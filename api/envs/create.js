@@ -35,7 +35,7 @@ module.exports = function (app, db) {
       req.body.config = {};
 
       // Insert environment
-      db.bulk({docs: [req.body]}, {all_or_nothing: true, new_edits: false}, function (err, body) {
+      db.bulk(app.bulk.env(req.body, req.project), {all_or_nothing: true, new_edits: false}, function (err, body) {
         if (err) return next(err);
 
         res.status(201);

@@ -7,6 +7,17 @@ var cryptPass = function (password) {
 module.exports = function (app) {
   app.bulk = {};
 
+  app.bulk.env = function (env, project) {
+    env.type = 'env';
+    env.org = project.org;
+    env.project = app.utils.slug(project);
+    env.config = {};
+    env.versions = [{ config: {}, time: Date.now() }];
+    env._id = project._id + '/envs/' + app.utils.idify(env.name);
+
+    return { docs: [env] };
+  }
+
   app.bulk.project = function (project, org) {
     project.type = 'project';
     project.org = app.utils.slug(org);
@@ -14,11 +25,13 @@ module.exports = function (app) {
     project._id = org._id + '/projects/' + app.utils.idify(project.name);
 
     var env = {
-      _id: project._id + '/envs/production', name: 'Production', description: 'Production environment',
-      type: 'env', project: app.utils.idify(project.name), org: project.org, config: {}
+      name: 'Production', description: 'Production environment'
     };
 
-    return { docs: [project, env] };
+    var tmp = app.bulk.env(env, project);
+    tmp.docs.unshift(project);
+
+    return tmp;
   };
 
   app.bulk.org = function (org, user) {
