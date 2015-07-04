@@ -10,12 +10,12 @@ var update = function (app, db) {
     req.env.config = req.body;
 
     // Update versions
-    req.env.versions.push({
+    req.env.versions.unshift({
       config: req.body, time: Date.now()
     });
 
     if (req.env.versions.length > 10) {
-      req.env.versions.shift();
+      req.env.versions.pop();
     }
 
     db.insert(req.env, req.env._id, function (err, body) {

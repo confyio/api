@@ -21,10 +21,10 @@ module.exports = function (macro) {
           assert.lengthOf(body, 2);
         },
         'should return versions from the database': function (err, res, body) {
-          assert.equal(body[0].config.database.url, "http://db.confy.io");
-          assert.equal(body[0].time, 1427633285584);
-          assert.equal(body[1].config, "EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==");
-          assert.equal(body[1].time, 1427638419608);
+          assert.equal(body[0].config, "EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==");
+          assert.equal(body[0].time, 1427638419608);
+          assert.equal(body[1].config.database.url, "http://db.confy.io");
+          assert.equal(body[1].time, 1427633285584);
         }
       }
     }
