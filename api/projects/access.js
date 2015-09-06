@@ -7,7 +7,7 @@ module.exports = function (app, db) {
     var errs = app.utils.need(req, ['team']);
     var team = req.body.team;
 
-    if (typeof team !== 'string' || team.length < 3 || team.length > 15 || team.match(/[a-z0-9][a-z0-9-]*[a-z0-9]/i)[0] !== team) {
+    if (typeof team !== 'string' || team.length < 3 || team.length > 15 || (team.match(/[a-z0-9][a-z0-9-]*[a-z0-9]/i) || [''])[0] !== team) {
       errs.push({ field: 'team', code: 'invalid' });
     }
 

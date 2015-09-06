@@ -8,7 +8,7 @@ module.exports = function (app, db) {
     var errs = app.utils.need(req, ['name', 'description']);
     var name = req.body.name;
 
-    if (typeof name !== 'string' || name.length < 3 || name.length > 15 || name.match(/[a-z0-9][a-z0-9\ ]*[a-z0-9]/i)[0] !== name) {
+    if (typeof name !== 'string' || name.length < 3 || name.length > 15 || (name.match(/[a-z0-9][a-z0-9\ ]*[a-z0-9]/i) || [''])[0] !== name) {
       errs.push({ field: 'name', code: 'invalid' });
     }
 

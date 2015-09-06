@@ -46,6 +46,15 @@ module.exports = function (macro) {
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['name', 'invalid']])
       },
+      'Creating them with invalid name': {
+        topic: function () {
+          macro.post('/orgs/confyio/projects/main/envs', {
+            name: '$@*', description: 'Production'
+          }, {user:'pksunkara', pass:'password'}, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['name', 'invalid']])
+      },
       'Creating them': {
         topic: function () {
           macro.post('/orgs/fire-size/projects/main-app/envs', {

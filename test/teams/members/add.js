@@ -19,7 +19,7 @@ module.exports = function (macro) {
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['user', 'does_not_exist']])
       },
-      'Adding member to team with too short name': {
+      'Adding member to team with too short user': {
         topic: function () {
           macro.post('/orgs/fire-size/teams/dev-gods/member', {
             user: 'u'
@@ -28,11 +28,20 @@ module.exports = function (macro) {
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['user', 'invalid']])
       },
-      'Adding member to team with too lengthy name': {
+      'Adding member to team with too lengthy user': {
         topic: function () {
           macro.post('/orgs/fire-size/teams/dev-gods/member', {
             user: 'iamtoolengthyusername'
           }, {user:'jsmith', pass:'secret'}, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['user', 'invalid']])
+      },
+      'Adding member to team with invalid user': {
+        topic: function () {
+          macro.post('/orgs/fire-size/teams/dev-gods/member', {
+            user: '$@&'
+          }, {user: 'jsmith', pass: 'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['user', 'invalid']])

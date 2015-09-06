@@ -55,6 +55,15 @@ module.exports = function (macro) {
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['name', 'invalid']])
       },
+      'Creating them with invalid name': {
+        topic: function () {
+          macro.post('/orgs/fire-size/teams', {
+            name: '$@*', description: 'Developers'
+          }, {user:'jsmith', pass:'secret'}, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['name', 'invalid']])
+      },
       'Creating them with heroku user': {
         topic: function () {
           macro.post('/orgs/app123/teams', {

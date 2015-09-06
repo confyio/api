@@ -50,6 +50,16 @@ module.exports = function (macro) {
         'should return 422': macro.status(422),
         'should return validation errors': macro.validation(1, [['username', 'invalid']])
       },
+      'Creating them with invalid username': {
+        topic: function () {
+          macro.post('/user', {
+            username: '@$*', password: 'secret',
+            email: 'pk@sunkara.com'
+          }, null, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['username', 'invalid']])
+      },
       'Creating them with invalid email': {
         topic: function () {
           macro.post('/user', {
