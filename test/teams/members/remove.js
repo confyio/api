@@ -53,7 +53,7 @@ module.exports = function (macro) {
           }, {user: 'jsmith', pass: 'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1),
+        'should return validation errors': macro.validation(1, [['user', 'forbidden']]),
         'should not update the team doc and it': macro.doc('orgs/fire-size/teams/dev-gods', {
           'should have owner in users list': function (err, body) {
             assert.isTrue(body.users['jsmith']);

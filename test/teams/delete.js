@@ -17,7 +17,7 @@ module.exports = function (macro) {
           macro.delete('/orgs/confyio/teams/owners', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['team', 'forbidden']])
       },
       'Deleting team with owner': {
         topic: function () {

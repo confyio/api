@@ -17,7 +17,7 @@ module.exports = function (macro) {
           }, {user:'jsmith', pass:'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['name', 'already_exists']])
       },
       'Creating them with too short name': {
         topic: function () {
@@ -26,7 +26,7 @@ module.exports = function (macro) {
           }, {user:'jsmith', pass:'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['name', 'invalid']])
       },
       'Creating them with too lengthy name': {
         topic: function () {
@@ -35,7 +35,7 @@ module.exports = function (macro) {
           }, {user:'jsmith', pass:'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['name', 'invalid']])
       },
       'Creating them with invalid email': {
         topic: function () {
@@ -44,7 +44,7 @@ module.exports = function (macro) {
           }, {user:'jsmith', pass:'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['email', 'invalid']])
       },
       'Creating them with heroku user': {
         topic: function () {

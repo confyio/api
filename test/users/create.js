@@ -18,7 +18,7 @@ module.exports = function (macro) {
           }, null, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['email', 'already_exists']])
       },
       'Creating them with existing username': {
         topic: function () {
@@ -28,7 +28,7 @@ module.exports = function (macro) {
           }, null, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['username', 'already_exists']])
       },
       'Creating them with too short username': {
         topic: function () {
@@ -38,7 +38,7 @@ module.exports = function (macro) {
           }, null, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['username', 'invalid']])
       },
       'Creating them with too lengthy username': {
         topic: function () {
@@ -48,7 +48,7 @@ module.exports = function (macro) {
           }, null, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['username', 'invalid']])
       },
       'Creating them with invalid email': {
         topic: function () {
@@ -58,7 +58,7 @@ module.exports = function (macro) {
           }, null, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['email', 'invalid']])
       },
       'Creating them': {
         topic: function () {

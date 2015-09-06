@@ -88,10 +88,16 @@ module.exports = {
       assert.equal(res.statusCode, code);
     }
   },
-  validation: function (number) {
+  validation: function (number, errors) {
+    errors = errors || [];
+
     return function (err, res, body) {
       assert.equal(body.message, 'Validation failed');
       assert.lengthOf(body.errors, number);
+
+      errors.forEach(function (item, index) {
+        assert.deepEqual(body.errors[index], { field: item[0], code: item[1] });
+      });
     }
   },
   redis: function (count, text) {

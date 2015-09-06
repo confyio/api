@@ -17,7 +17,25 @@ module.exports = function (macro) {
           }, {user: 'jsmith', pass: 'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['team', 'does_not_exist']])
+      },
+      'Adding team to project with too short name': {
+        topic: function () {
+          macro.post('/orgs/fire-size/projects/main-app/access', {
+            team: 't'
+          }, {user:'jsmith', pass:'secret'}, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['team', 'invalid']])
+      },
+      'Adding team to project with too lengthy name': {
+        topic: function () {
+          macro.post('/orgs/fire-size/projects/main-app/access', {
+            team: 'teams-management'
+          }, {user:'jsmith', pass:'secret'}, this.callback);
+        },
+        'should return 422': macro.status(422),
+        'should return validation errors': macro.validation(1, [['team', 'invalid']])
       },
       'Adding team to project': {
         topic: function () {

@@ -51,7 +51,7 @@ module.exports = function (macro) {
           }, {user: 'jsmith', pass: 'secret'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1),
+        'should return validation errors': macro.validation(1, [['team', 'forbidden']]),
         'should not update the project doc and it': macro.doc('orgs/fire-size/projects/main-app', {
           'should have default team in teams list': function (err, body) {
             assert.isTrue(body.teams['owners']);

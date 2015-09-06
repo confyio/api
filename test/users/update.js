@@ -75,7 +75,7 @@ module.exports = function (macro) {
           }, {user: 'whatupdave', pass: 'password'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1),
+        'should return validation errors': macro.validation(1, [['email', 'already_exists']]),
         'should not update user doc and it': macro.doc('users/whatupdave', {
           'should have old email': function (err, body) {
             assert.equal(body.email, 'dave@snappyco.de');
@@ -89,7 +89,7 @@ module.exports = function (macro) {
           }, {user: 'whatupdave', pass: 'password'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1),
+        'should return validation errors': macro.validation(1, [['email', 'invalid']]),
         'should not update user doc and it': macro.doc('users/whatupdave', {
           'should have old email': function (err, body) {
             assert.equal(body.email, 'dave@snappyco.de');

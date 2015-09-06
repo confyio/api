@@ -17,7 +17,7 @@ module.exports = function (macro) {
           macro.delete('/orgs/pksunkara', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1)
+        'should return validation errors': macro.validation(1, [['org', 'forbidden']])
       },
       'Deleting org with owner': {
         topic: function () {

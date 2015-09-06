@@ -17,7 +17,7 @@ module.exports = function (macro) {
           macro.delete('/orgs/confyio/projects/main/envs/production', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
         'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1),
+        'should return validation errors': macro.validation(1, [['env', 'forbidden']]),
         'should not delete envrionment doc': macro.doc('orgs/confyio/projects/main/envs/production')
       },
       'Deleting envrionment with member': {
