@@ -9,7 +9,7 @@
   },
   "license": "BSD",
   "engines": {
-    "node": ">= 6"
+    "node": "4.x.x"
   },
   "dependencies": {
     "express": "4.13.x",
