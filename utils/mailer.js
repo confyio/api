@@ -4,7 +4,7 @@ var path = require('path')
 
 module.exports = function (app) {
 
-  var mail = new mailgun({
+  var mail = mailgun({
     apiKey: app.get('mailgun-key'),
     domain: app.get('mailgun-domain')
   });

@@ -3,8 +3,7 @@ var express = require('express')
   , bodyParser = require('body-parser')
   , segment = require('analytics-node')
   , raven = require('raven')
-  , redis = require('redis')
-  , url = require('url');
+  , redis = require('redis');
 
 var app = express();
 
@@ -32,13 +31,7 @@ require('./utils/logger')(app);
 var db = nano(app.get('db')).use(app.get('dbname'));
 
 // Setup redis
-var redisUrl = url.parse(app.get('redis'));
-
-app.redis = redis.createClient(redisUrl.port, redisUrl.hostname, {enable_offline_queue: false});
-
-if (redisUrl.auth) {
-  app.redis.auth(redisUrl.auth.split(':')[1]);
-}
+app.redis = redis.createClient({url: app.get('redis'), enable_offline_queue: false});
 
 // Setup utility functions
 require('./utils/auth')(app, db);
@@ -61,6 +54,6 @@ require('./api/heroku')(app, db);
 require('./utils/error')(app);
 
 // Start Server
-var server = app.listen(app.get('port'), function () {
+module.exports = app.listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
 });

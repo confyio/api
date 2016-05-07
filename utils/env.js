@@ -17,7 +17,7 @@ module.exports = function (app) {
   app.set('mailgun-key', process.env.MAILGUN_API_KEY);
   app.set('mailgun-domain', process.env.MAILGUN_DOMAIN);
 
-  app.set('redis', process.env.REDISCLOUD_URL || 'http://localhost:6379');
+  app.set('redis', process.env.REDISCLOUD_URL || 'redis://localhost:6379');
 
   app.set('sentry', process.env.SENTRY_URL || false);
   app.set('segment', process.env.SEGMENT_KEY || 'aY0rT1xmTtolsdEQ6JWRPYMCFAcQA4C3');

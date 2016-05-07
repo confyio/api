@@ -9,24 +9,24 @@
   },
   "license": "BSD",
   "engines": {
-    "node": "0.10.x"
+    "node": ">= 6"
   },
   "dependencies": {
-    "express": "4.12.x",
+    "express": "4.13.x",
     "bcrypt": "0.8.x",
-    "morgan": "1.5.x",
-    "body-parser": "1.12.x",
-    "nano": "6.1.x",
-    "redis": "0.12.x",
-    "mailgun-js": "0.5.x",
-    "raven": "0.7.x",
-    "analytics-node": "1.2.x",
-    "validator": "3.x.x"
+    "morgan": "1.7.x",
+    "body-parser": "1.15.x",
+    "nano": "6.2.x",
+    "redis": "2.x.x",
+    "mailgun-js": "0.7.x",
+    "raven": "0.10.x",
+    "analytics-node": "2.1.x",
+    "validator": "5.x.x"
   },
   "devDependencies": {
-    "vows": "~0.7.0",
-    "request": "2.54.x",
-    "istanbul": "0.3.x"
+    "vows": "^0.7.0",
+    "request": "2.72.x",
+    "istanbul": "0.4.x"
   },
   "scripts": {
     "test": "vows test/test.js --spec",

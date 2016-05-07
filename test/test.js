@@ -68,7 +68,7 @@ vows.describe('confy').addBatch({
 }).addBatch({
   'API Server': {
     topic: function () {
-      app.listen(app.get('port'), this.callback);
+      return app;
     },
     'should be running': function (server) {
       assert.isNotNull(server);

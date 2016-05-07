@@ -21,7 +21,7 @@ module.exports = function (app, db) {
       errs.push({ field: 'password', code: 'insecure' });
     }
 
-    if (!validator.isEmail(req.body.email)) {
+    if (!req.body.email || !validator.isEmail(req.body.email)) {
       errs.push({ field: 'email', code: 'invalid' });
     }
 
