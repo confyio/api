@@ -1,8 +1,6 @@
-# Confy [![Build Status](https://travis-ci.org/asm-products/confy.svg)](https://travis-ci.org/asm-products/confy)
+# Confy [![Build Status](https://travis-ci.org/confyio/confy.svg)](https://travis-ci.org/confyio/confy)
 
-_Software Credentials Management System_
-
-This is a product being built by the Assembly community. You can help push this idea forward by visiting [https://assembly.com/confy](https://assembly.com/confy).
+_Easily Manage your Software Credentials_
 
 A good web app stores it's credentials in environment vars. As the number of credentials is high, developers can use "Confy" to pull them from the cloud using a single environment var.
 
@@ -10,12 +8,12 @@ A good web app stores it's credentials in environment vars. As the number of cre
 
 Prerequisites are:
 
- * Node.js __v0.10.x__
+ * Node.js __v6__
  * CouchDB __v1.2.x__ [dbname: confy]
  * Redis __v2.8.x__
 
 ```bash
-$ git clone git://github.com/asm-products/confy && cd confy
+$ git clone git://github.com/confyio/confy && cd confy
 
 $ export MAILGUN_API_KEY="key-ivd0lsd91b1bvw31mw7"
 $ export MAILGUN_DOMAIN="sample.mailgun.org"
@@ -29,7 +27,7 @@ $ node app.js
 
 ## Idea
 
-**Confy** is a **SaaS** product where web app developers can store their application credentials (also known as application config) in the cloud and retrieve it when starting up their app.
+**Confy** is a **SaaS** product where developers can manage their software credentials (also known as application config) by storing them in the cloud and retrieve them when starting up their app.
 
 An app’s **config** is everything that is likely to vary between deploys (staging, production, developer environments, etc). This includes:
 
@@ -48,9 +46,3 @@ Heroku and other platforms encourage using environment variables for storing con
 The above proposed approach passes the above litmus test.
 
 _(A few of the above quotes are taken directly from [12factor.net](http://12factor.net))_
-
-## How Assembly Works
-
-Assembly products are like open-source and made with contributions from the community. Assembly handles the boring stuff like hosting, support, financing, legal, etc. Once the product launches we collect the revenue and split the profits amongst the contributors.
-
-Visit [https://assembly.com](https://assembly.com) to learn more.
