@@ -20,7 +20,7 @@ module.exports = function (app) {
   app.set('redis', process.env.REDISCLOUD_URL || 'redis://localhost:6379');
 
   app.set('sentry', process.env.SENTRY_URL || false);
-  app.set('segment', process.env.SEGMENT_KEY || 'aY0rT1xmTtolsdEQ6JWRPYMCFAcQA4C3');
+  app.set('segment', process.env.SEGMENT_KEY || 'V9kSmRvA2aBD2azy4t8SKMdXACKBYtak');
 
   app.set('stripe', process.env.STRIPE_SECRET_KEY || 'sk_test_MAO8DoOXNpzdBm44T0G8qK9b');
 };
