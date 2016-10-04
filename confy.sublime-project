@@ -1,0 +1,11 @@
+{
+	"folders":
+	[
+		{
+			"name": "Confy",
+			"follow_symlinks": true,
+			"folder_exclude_patterns": ["coverage", ".elasticbeanstalk"],
+			"path": "/"
+		}
+	]
+}
