@@ -12,20 +12,20 @@
     "node": "4.x.x"
   },
   "dependencies": {
-    "express": "4.13.x",
-    "bcrypt": "0.8.x",
-    "morgan": "1.7.x",
-    "body-parser": "1.15.x",
-    "nano": "6.2.x",
-    "redis": "2.x.x",
-    "mailgun-js": "0.7.x",
-    "raven": "0.10.x",
     "analytics-node": "2.1.x",
-    "validator": "5.x.x"
+    "bcrypt": "0.8.x",
+    "body-parser": "1.15.x",
+    "express": "^4.14.0",
+    "mailgun-js": "0.7.x",
+    "morgan": "1.7.x",
+    "nano": "git://github.com/dscape/nano#master",
+    "raven": "^1.0.0-beta.1",
+    "redis": "2.x.x",
+    "request": "2.x.x",
+    "validator": "6.x.x"
   },
   "devDependencies": {
     "vows": "^0.7.0",
-    "request": "2.72.x",
     "istanbul": "0.4.x"
   },
   "scripts": {
