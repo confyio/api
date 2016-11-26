@@ -12,13 +12,15 @@ module.exports = function (macro) {
           assert.deepEqual(body, {message: 'Not found'});
         }
       },
-      'Deleting the default envrionment': {
+      'Deleting environment with owner': {
         topic: function () {
           macro.delete('/orgs/confyio/projects/main/envs/production', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
         },
-        'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1, [['env', 'forbidden']]),
-        'should not delete envrionment doc': macro.doc('orgs/confyio/projects/main/envs/production')
+        'should return 204': macro.status(204),
+        'should not return the environment': function (err, res, body) {
+          assert.isUndefined(body);
+        },
+        'should delete envrionment doc and it': macro.nodoc('orgs/confyio/projects/main/envs/production', 'deleted')
       },
       'Deleting envrionment with member': {
         topic: function () {
