@@ -53,8 +53,13 @@ module.exports = function (app, db) {
           req.body.fullname = req.body.username;
         }
 
-        req.body.verified = false;
-        req.body.verification_token = crypto.randomBytes(20).toString('hex');
+        if (app.get('mailgun-domain')) {
+          req.body.verified = false;
+          req.body.verification_token = crypto.randomBytes(20).toString('hex');
+        }
+        else {
+          req.body.verified = true;
+        }
 
         // Insert user
         db.bulk(app.bulk.user(req.body), {all_or_nothing: true, new_edits: false}, function (err, body) {

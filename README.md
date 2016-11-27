@@ -9,15 +9,10 @@ A good web app stores it's credentials in environment vars. As the number of cre
 Prerequisites are:
 
  * Node.js __v6__
- * CouchDB __v1.2.x__ [dbname: confy]
+ * CouchDB __v1.2.x__
  * Redis __v2.8.x__
 
 ```bash
-$ git clone git://github.com/confyio/confy && cd confy
-
-$ export MAILGUN_API_KEY="key-ivd0lsd91b1bvw31mw7"
-$ export MAILGUN_DOMAIN="sample.mailgun.org"
-
 # Setup development requirements and seed development database
 $ npm install && node test/setup.js
 
