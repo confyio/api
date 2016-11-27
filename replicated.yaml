@@ -1,0 +1,55 @@
+replicated_api_version: 2.3.5
+name: Confy
+version: "0.1.0"
+release_notes: The initial release of Confy
+properties:
+  app_url: http://{{repl ThisHostPrivateIpAddress }}
+  console_title: Confy
+backup:
+  enabled: false
+components:
+  - name: DB
+    containers:
+      - source: public
+        image_name: redis
+        version: 3.2.5-alpine
+        publish_events:
+          - name: Container redis started
+            trigger: container-start
+            data: ""
+            subscriptions:
+              - component: DB
+                container: couchdb
+                action: start
+        volumes:
+          - host_path: /data
+            container_path: /data
+        restart:
+          policy: on-failure
+          max: 1000
+      - source: public
+        image_name: couchdb
+        version: latest
+        publish_events:
+          - name: Container couchdb started
+            trigger: container-start
+            data: ""
+            subscriptions:
+              - component: Backend
+                container: confy
+                action: start
+  - name: Backend
+    containers:
+      - source: replicated
+        image_name: confy
+        version: latest
+        publish_events:
+          - name: Container server started
+            trigger: container-start
+            data: ""
+            subscriptions: []
+        env_vars:
+          - name: REDISCLOUD_URL
+            static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\" }}:"{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\" }}""
+        restart:
+          policy: always

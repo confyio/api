@@ -29,6 +29,7 @@
     "istanbul": "0.4.x"
   },
   "scripts": {
+    "docker": "docker build -t confy/confy .",
     "test": "vows test/test.js --spec",
     "cover": "istanbul cover vows -- test/test.js --spec"
   }
