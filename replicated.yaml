@@ -25,8 +25,7 @@ components:
           - host_path: /data
             container_path: /data
         restart:
-          policy: on-failure
-          max: 1000
+          policy: always
       - source: public
         image_name: couchdb
         version: latest
@@ -53,3 +52,7 @@ components:
             static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\" }}:"{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\" }}""
         restart:
           policy: always
+        ports:
+          - private_port: "5000"
+            public_port: "5000"
+            port_type: tcp
