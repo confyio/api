@@ -22,8 +22,12 @@ module.exports = function (macro) {
         },
         'should return versions from the database': function (err, res, body) {
           assert.equal(body[0].config, "EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==");
+          assert.equal(body[0].user.username, "pksunkara");
+          assert.equal(body[0].user.fullname, "Pavan Kumar Sunkara");
           assert.equal(body[0].time, 1427638419608);
           assert.equal(body[1].config.database.url, "http://db.confy.io");
+          assert.equal(body[1].user.username, "vanstee");
+          assert.equal(body[1].user.fullname, "Patrick van Stee");
           assert.equal(body[1].time, 1427633285584);
         }
       }

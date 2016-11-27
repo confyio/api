@@ -11,7 +11,9 @@ var update = function (app, db) {
 
     // Update versions
     req.env.versions.unshift({
-      config: req.body, time: Date.now()
+      config: req.body,
+      user: req.user.username,
+      time: Date.now()
     });
 
     if (req.env.versions.length > 10) {

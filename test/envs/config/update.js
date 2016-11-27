@@ -40,7 +40,10 @@ module.exports = function (macro) {
             assert.equal(body.config.database.port, 6984);
             assert.isUndefined(body.config.database.pass);
             assert.isUndefined(body.config._id);
-          }
+          },
+          'should have editor in versions': function (err, body) {
+            assert.equal(body.versions[0].user, 'pksunkara');
+          },
         })
       }
     }
