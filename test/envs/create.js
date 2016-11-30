@@ -70,6 +70,7 @@ module.exports = function (macro) {
           assert.equal(body.project, 'main-app');
           assert.equal(body.org, 'fire-size');
           assert.equal(body.type, 'env');
+          assert.isDefined(body.token);
         },
         'should not save other keys': function (err, res, body) {
           assert.isUndefined(body.random);

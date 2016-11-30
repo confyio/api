@@ -127,6 +127,7 @@ vows.describe('confy').addBatch({
 .addBatch(require('./envs/config/retrieve')(macro))
 .addBatch(require('./envs/config/update')(macro))
 .addBatch(require('./envs/versions')(macro))
+.addBatch(require('./envs/reset')(macro))
 .addBatch(require('./teams/projects')(macro))
 .addBatch(require('./teams/members/add')(macro))
 .addBatch(require('./teams/members/list')(macro))

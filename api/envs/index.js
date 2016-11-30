@@ -27,4 +27,6 @@ module.exports = function (app, db) {
 
   require('./config')(app, db);
   require('./versions')(app, db);
+
+  require('./reset')(app, db);
 };

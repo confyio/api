@@ -32,6 +32,18 @@ var update = function (app, db) {
 
 module.exports = function (app, db) {
 
+  app.get('/orgs/:orgname/config/:token', function (req, res, next) {
+    db.view('envs', 'token', {keys: [req.params.token]}, function (err, body) {
+      if (err || body.rows.length != 1) return next(err);
+
+      if (body.rows[0].value.org != req.org.name) {
+        return next();
+      }
+
+      res.json(body.rows[0].value.config);
+    });
+  });
+
   app.get('/orgs/:orgname/projects/:project/envs/:env/config', app.auth.project, function (req, res, next) {
     res.json(req.env.config);
   });

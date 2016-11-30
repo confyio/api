@@ -1,3 +1,19 @@
+var crypto = require('crypto');
+
+var tokenUnique = function (db, next) {
+  var token = crypto.randomBytes(20).toString('hex');
+
+  db.view('envs', 'token', {keys: [token]}, function (err, body) {
+    if (err) return next(err);
+
+    if (body.rows.length == 0) {
+      return next(null, token);
+    } else {
+      return tokenUnique(db, next);
+    }
+  });
+};
+
 module.exports = function (app, db) {
 
   // Create an environment
@@ -28,20 +44,27 @@ module.exports = function (app, db) {
         return app.errors.validation(res, [{ field: 'name', code: 'already_exists' }]);
       }
 
-      req.body.type = 'env';
-      req.body.project = project;
-      req.body.org = org;
-      req.body._id = 'orgs/' + org + '/projects/' + project + '/envs/' + env;
-      req.body.config = {};
-
-      // Insert environment
-      db.bulk(app.bulk.env(req.body, req.project), {all_or_nothing: true, new_edits: false}, function (err, body) {
+      tokenUnique(db, function (err, token) {
         if (err) return next(err);
 
-        res.status(201);
-        app.utils.shield(req.body, ['config', 'versions']);
-        res.json(req.body);
+        req.body.type = 'env';
+        req.body.project = project;
+        req.body.org = org;
+        req.body.token = token;
+        req.body._id = 'orgs/' + org + '/projects/' + project + '/envs/' + env;
+        req.body.config = {};
+
+        // Insert environment
+        db.bulk(app.bulk.env(req.body, req.project), {all_or_nothing: true, new_edits: false}, function (err, body) {
+          if (err) return next(err);
+
+          res.status(201);
+          app.utils.shield(req.body, ['config', 'versions']);
+          res.json(req.body);
+        });
       });
     });
   });
 };
+
+module.exports.tokenUnique = tokenUnique;
