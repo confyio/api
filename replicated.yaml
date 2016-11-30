@@ -1,18 +1,22 @@
 replicated_api_version: 2.3.5
 name: Confy
-version: "0.1.0"
+version: "0.1.1"
 release_notes: The initial release of Confy
 properties:
-  app_url: http://{{repl ThisHostPrivateIpAddress }}
+  app_url: http://{{repl ConfigOption "hostname" }}
   console_title: Confy
 backup:
   enabled: false
+cmds:
+  - name: host_ip
+    cmd: publicip
+    args: []
 components:
   - name: DB
     containers:
       - source: public
         image_name: redis
-        version: 3.2.5-alpine
+        version: alpine
         publish_events:
           - name: Container redis started
             trigger: container-start
@@ -22,13 +26,13 @@ components:
                 container: couchdb
                 action: start
         volumes:
-          - host_path: /data
+          - host_path: /data/redis
             container_path: /data
         restart:
           policy: always
       - source: public
         image_name: couchdb
-        version: latest
+        version: "1.6"
         publish_events:
           - name: Container couchdb started
             trigger: container-start
@@ -37,22 +41,48 @@ components:
               - component: Backend
                 container: confy
                 action: start
+        volumes:
+          - host_path: /data/couchdb
+            container_path: /usr/local/var/lib/couchdb
+        restart:
+          policy: always
   - name: Backend
     containers:
       - source: replicated
         image_name: confy
-        version: latest
+        version: "0.1.1"
         publish_events:
           - name: Container server started
             trigger: container-start
             data: ""
             subscriptions: []
+          - name: Couchdb data seeded
+            trigger: exec
+            args: ["node", "test/setup.js"]
+            subscriptions: []
         env_vars:
+          - name: NODE_ENV
+            static_val: production
           - name: REDISCLOUD_URL
-            static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\" }}:"{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\" }}""
+            static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\" }}:{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\" }}"
+          - name: CLOUDANT_URL
+            static_val: "http://{{repl HostPrivateIpAddress \"DB\" \"couchdb\" }}:{{repl ContainerExposedPort \"DB\" \"couchdb\" \"5984\" }}"
         restart:
           policy: always
         ports:
           - private_port: "5000"
             public_port: "5000"
             port_type: tcp
+config:
+  - name: hostname
+    title: Hostname
+    description: Ensure this domain name is routable on your network.
+    items:
+      - name: hostname
+        title: Hostname
+        type: text
+        default: ""
+        value_cmd:
+          name: host_ip
+          value_at: 0
+        required: true
