@@ -20,6 +20,11 @@ if (!app.get('onpremise')) {
   if (app.get('env') === 'production') {
     app.sentry.patchGlobal();
   }
+} else {
+  app.analytics = {
+    identify: function () {},
+    track: function () {}
+  };
 }
 
 // Setup middleware

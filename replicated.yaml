@@ -59,7 +59,7 @@ components:
     containers:
       - source: replicated
         image_name: confy
-        version: "0.1.2"
+        version: "0.1.3"
         ephemeral: true
         cmd: '["node", "test/setup.js"]'
         publish_events:
