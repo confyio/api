@@ -50,12 +50,11 @@ module.exports = function (app, db) {
         req.body.type = 'env';
         req.body.project = project;
         req.body.org = org;
-        req.body.token = token;
         req.body._id = 'orgs/' + org + '/projects/' + project + '/envs/' + env;
         req.body.config = {};
 
         // Insert environment
-        db.bulk(app.bulk.env(req.body, req.project), {all_or_nothing: true, new_edits: false}, function (err, body) {
+        db.bulk(app.bulk.env(req.body, req.project, token), {all_or_nothing: true, new_edits: false}, function (err, body) {
           if (err) return next(err);
 
           res.status(201);

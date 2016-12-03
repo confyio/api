@@ -1,3 +1,5 @@
+var tokenUnique = require('../envs/create').tokenUnique;
+
 module.exports = function (app, db) {
 
   // Create a project
@@ -34,15 +36,19 @@ module.exports = function (app, db) {
           req.body.users[user] = 1;
         });
 
-        // Insert project
-        db.bulk(app.bulk.project(req.body, req.org), {all_or_nothing: true}, function (err, body) {
+        tokenUnique(db, function (err, token) {
           if (err) return next(err);
 
-          req.body.teams = Object.keys(req.body.teams);
-          delete req.body.users;
+          // Insert project
+          db.bulk(app.bulk.project(req.body, req.org, token), {all_or_nothing: true}, function (err, body) {
+            if (err) return next(err);
 
-          res.status(201);
-          res.json(req.body);
+            req.body.teams = Object.keys(req.body.teams);
+            delete req.body.users;
+
+            res.status(201);
+            res.json(req.body);
+          });
         });
       });
     });

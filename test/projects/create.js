@@ -107,7 +107,11 @@ module.exports = function (macro) {
             assert.deepEqual(body.teams, {owners:true});
           }
         }),
-        'should create project environment doc and it': macro.doc('orgs/fire-size/projects/main-app/envs/production')
+        'should create project environment doc and it': macro.doc('orgs/fire-size/projects/main-app/envs/production', {
+          'should have token': function (err, body) {
+            assert.isDefined(body.token);
+          }
+        })
       }
     }
   };

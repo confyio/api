@@ -1,4 +1,5 @@
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt')
+  , crypto = require('crypto');
 
 var cryptPass = function (password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -7,10 +8,11 @@ var cryptPass = function (password) {
 module.exports = function (app) {
   app.bulk = {};
 
-  app.bulk.env = function (env, project) {
+  app.bulk.env = function (env, project, token) {
     env.type = 'env';
     env.org = project.org;
     env.project = app.utils.slug(project);
+    env.token = token;
     env.config = {};
     env.versions = [{ config: {}, time: Date.now() }];
     env._id = project._id + '/envs/' + app.utils.idify(env.name);
@@ -18,7 +20,7 @@ module.exports = function (app) {
     return { docs: [env] };
   }
 
-  app.bulk.project = function (project, org) {
+  app.bulk.project = function (project, org, token) {
     project.type = 'project';
     project.org = app.utils.slug(org);
     project.teams = {'owners': true};
@@ -28,7 +30,7 @@ module.exports = function (app) {
       name: 'Production', description: 'Production environment'
     };
 
-    var tmp = app.bulk.env(env, project);
+    var tmp = app.bulk.env(env, project, token);
     tmp.docs.unshift(project);
 
     return tmp;
@@ -79,9 +81,10 @@ module.exports = function (app) {
     project.users[user.username] = true;
 
     var tmp = app.bulk.user(user);
+    var token = crypto.randomBytes(20).toString('hex');
 
     tmp.docs[1].plan = 'heroku';
-    tmp.docs = tmp.docs.concat(app.bulk.project(project, tmp.docs[1]).docs);
+    tmp.docs = tmp.docs.concat(app.bulk.project(project, tmp.docs[1], token).docs);
 
     return tmp;
   };
