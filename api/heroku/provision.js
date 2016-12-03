@@ -2,7 +2,7 @@ var crypto = require('crypto');
 
 module.exports = function (app, db) {
 
-  var ssl = (app.get('ssl') == true ? 8 : 7);
+  var ssl = (app.get('ssl') ? 8 : 7);
 
   // Provision for heroku
   app.post('/heroku/resources', app.auth.heroku, function (req, res, next) {

@@ -1,6 +1,6 @@
 replicated_api_version: 2.3.5
 name: Confy
-version: "0.1.1"
+version: "0.2.0"
 release_notes: The initial release of Confy
 properties:
   app_url: http://{{repl ConfigOption "hostname" }}
@@ -18,7 +18,7 @@ components:
         image_name: redis
         version: alpine
         publish_events:
-          - name: Container redis started
+          - name: Redis started
             trigger: container-start
             data: ""
             subscriptions:
@@ -34,44 +34,95 @@ components:
         image_name: couchdb
         version: "1.6"
         publish_events:
-          - name: Container couchdb started
-            trigger: container-start
-            data: ""
+          - name: CouchDB started
+            trigger: port-listen
+            data: "5984"
             subscriptions:
-              - component: Backend
+              - component: Seed
                 container: confy
                 action: start
         volumes:
           - host_path: /data/couchdb
             container_path: /usr/local/var/lib/couchdb
+        env_vars:
+          - name: COUCHDB_USER
+            static_val: "{{repl ConfigOption \"dbusername\"}}"
+          - name: COUCHDB_PASSWORD
+            static_val: "{{repl ConfigOption \"dbpassword\"}}"
         restart:
           policy: always
+        ports:
+          - private_port: "5984"
+            public_port: "5984"
+            port_type: tcp
+  - name: Seed
+    containers:
+      - source: replicated
+        image_name: confy
+        version: "0.1.2"
+        ephemeral: true
+        cmd: '["node", "test/setup.js"]'
+        publish_events:
+          - name: CouchDB data seeded
+            trigger: container-stop
+            data: ""
+            subscriptions:
+              - component: Backend
+                container: confy
+                action: start
+        env_vars:
+          - name: NODE_ENV
+            static_val: production
+          - name: CLOUDANT_URL
+            static_val: "http://{{repl ConfigOption \"dbusername\"}}:{{repl ConfigOption \"dbpassword\"}}@{{repl HostPrivateIpAddress \"DB\" \"couchdb\"}}:5984"
   - name: Backend
     containers:
       - source: replicated
         image_name: confy
-        version: "0.1.1"
+        version: "0.1.2"
         publish_events:
-          - name: Container server started
+          - name: API Server started
             trigger: container-start
             data: ""
-            subscriptions: []
-          - name: Couchdb data seeded
-            trigger: exec
-            args: ["node", "test/setup.js"]
-            subscriptions: []
+            subscriptions:
+              - component: Frontend
+                container: web
+                action: start
         env_vars:
           - name: NODE_ENV
             static_val: production
           - name: REDISCLOUD_URL
-            static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\" }}:{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\" }}"
+            static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\"}}:{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\"}}"
           - name: CLOUDANT_URL
-            static_val: "http://{{repl HostPrivateIpAddress \"DB\" \"couchdb\" }}:{{repl ContainerExposedPort \"DB\" \"couchdb\" \"5984\" }}"
+            static_val: "http://{{repl ConfigOption \"dbusername\"}}:{{repl ConfigOption \"dbpassword\"}}@{{repl HostPrivateIpAddress \"DB\" \"couchdb\"}}:5984"
+          - name: BASE_URL
+            static_val: "http://{{repl ConfigOption \"hostname\"}}:5000"
+          - name: WEB_URL
+            static_val: "http://{{repl ConfigOption \"hostname\"}}"
+          - name: ON_PREMISE
+            static_val: "1"
         restart:
           policy: always
         ports:
           - private_port: "5000"
             public_port: "5000"
+            port_type: tcp
+  - name: Frontend
+    containers:
+      - source: replicated
+        image_name: web
+        version: "0.1.1"
+        publish_events:
+          - name: Frontend started
+            trigger: port-listen
+            data: "80"
+            subscriptions: []
+        env_vars:
+        restart:
+          policy: always
+        ports:
+          - private_port: "8000"
+            public_port: "80"
             port_type: tcp
 config:
   - name: hostname
@@ -85,4 +136,18 @@ config:
         value_cmd:
           name: host_ip
           value_at: 0
+        required: true
+  - name: dbadmin
+    title: Database Admin
+    description: Secure the CouchDB with username and password
+    items:
+      - name: dbusername
+        title: Username
+        type: text
+        default: "username"
+        required: true
+      - name: dbpassword
+        title: Password
+        type: text
+        default: "password"
         required: true

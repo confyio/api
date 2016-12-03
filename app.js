@@ -10,14 +10,16 @@ var app = express();
 // Setup environment variables
 require('./utils/env')(app);
 
-// Setup Segment analytics
-app.analytics = new segment(app.get('segment'));
+if (!app.get('onpremise')) {
+  // Setup Segment analytics
+  app.analytics = new segment(app.get('segment'));
 
-// Setup Sentry
-app.sentry = new raven.Client(app.get('sentry'));
+  // Setup Sentry
+  app.sentry = new raven.Client(app.get('sentry'));
 
-if (app.get('env') === 'production') {
-  app.sentry.patchGlobal();
+  if (app.get('env') === 'production') {
+    app.sentry.patchGlobal();
+  }
 }
 
 // Setup middleware
@@ -47,8 +49,10 @@ require('./api/teams')(app, db);
 require('./api/projects')(app, db);
 require('./api/envs')(app, db);
 
-// Heroku addon
-require('./api/heroku')(app, db);
+if (!app.get('onpremise')) {
+  // Heroku addon
+  require('./api/heroku')(app, db);
+}
 
 // Error handling
 require('./utils/error')(app);

@@ -3,12 +3,11 @@ var path = require('path')
   , mailgun = require('mailgun-js');
 
 module.exports = function (app) {
-
   app.mail = {};
 
   var files = fs.readdirSync(path.join(__dirname, 'mails'));
 
-  if (app.get('mailgun-domain')) {
+  if (!app.get('onpremise')) {
     var mail = mailgun({
       apiKey: app.get('mailgun-key'),
       domain: app.get('mailgun-domain')

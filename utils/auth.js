@@ -68,7 +68,7 @@ module.exports = function (app, db) {
 
             return next();
           } catch (err) {
-            app.sentry.captureError(err);
+            return next(err);
           }
         }
 
