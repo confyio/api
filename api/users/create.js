@@ -53,7 +53,7 @@ module.exports = function (app, db) {
           req.body.fullname = req.body.username;
         }
 
-        if (app.get('mailgun-domain')) {
+        if (!app.get('onpremise')) {
           req.body.verified = false;
           req.body.verification_token = crypto.randomBytes(20).toString('hex');
         }
