@@ -1,36 +1,41 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Environment Versions': {
-      'Listing them with no access': {
-        topic: function () {
-          macro.get('/orgs/confyio/projects/main/envs/production/versions', {user: 'vanstee', pass: 'password'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Not found'});
-        }
-      },
-      'Listing them with member': {
-        topic: function () {
-          macro.get('/orgs/confyio/projects/knowledge-base/envs/production/versions', {user:'vanstee', pass:'password'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return array of versions': function (err, res, body) {
-          assert.lengthOf(body, 2);
-        },
-        'should return versions from the database': function (err, res, body) {
-          assert.equal(body[0].config, "EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==");
-          assert.equal(body[0].user.username, "pksunkara");
-          assert.equal(body[0].user.fullname, "Pavan Kumar Sunkara");
-          assert.equal(body[0].time, 1427638419608);
-          assert.equal(body[1].config.database.url, "http://db.confy.io");
-          assert.equal(body[1].user.username, "vanstee");
-          assert.equal(body[1].user.fullname, "Patrick van Stee");
-          assert.equal(body[1].time, 1427633285584);
-        }
-      }
-    }
-  };
-}
+  describe('Environment Versions', function () {
+
+    describe('Listing them with no access', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/projects/main/envs/production/versions', {user: 'vanstee', pass: 'password'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {'message':'Not found'});
+      });
+    });
+
+    describe('Listing them with member', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/projects/knowledge-base/envs/production/versions', {user:'vanstee', pass:'password'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return array of versions', function () {
+        assert.lengthOf(ret.body, 2);
+      });
+
+      it('should return versions from the database', function () {
+        assert.equal(ret.body[0].config, "EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==");
+        assert.equal(ret.body[0].user.username, "pksunkara");
+        assert.equal(ret.body[0].user.fullname, "Pavan Kumar Sunkara");
+        assert.equal(ret.body[0].time, 1427638419608);
+        assert.equal(ret.body[1].config.database.url, "http://db.confy.io");
+        assert.equal(ret.body[1].user.username, "vanstee");
+        assert.equal(ret.body[1].user.fullname, "Patrick van Stee");
+        assert.equal(ret.body[1].time, 1427633285584);
+      });
+    });
+  });
+};

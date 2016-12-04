@@ -1,56 +1,73 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Environments': {
-      'Updating environment with member': {
-        topic: function () {
-          macro.patch('/orgs/confyio/projects/main/envs/production', {
-            description: 'Main production environment',
-            random: '1i3je738ujf',
-            org: 'hacked'
-          }, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return the environment': function (err, res, body) {
-          assert.equal(body._id, 'orgs/confyio/projects/main/envs/production');
-          assert.equal(body.name, 'Production');
-          assert.equal(body.description, 'Main production environment');
-          assert.equal(body.project, 'main')
-          assert.equal(body.org, 'confyio');
-          assert.equal(body.type, 'env');
-        },
-        'should not update random fields': function (err, res, body) {
-          assert.isUndefined(body.random);
-        },
-        'should not return config': function (err, res, body) {
-          assert.isUndefined(body.config);
-        },
-        'should not return versions': function (err, res, body) {
-          assert.isUndefined(body.versions);
-        },
-        'should update environment doc and it': macro.doc('orgs/confyio/projects/main/envs/production', {
-          'should have updated description': function (err, body) {
-            assert.equal(body.description, 'Main production environment');
-          }
-        })
-      },
-      'Updating environment with no access': {
-        topic: function () {
-          macro.patch('/orgs/confyio/projects/main/envs/staging', {
-            description: 'Seriously!',
-          }, {user: 'vanstee', pass: 'password'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        },
-        'should not update environment doc and it': macro.doc('orgs/confyio/projects/main/envs/staging', {
-          'should have old description': function (err, body) {
-            assert.equal(body.description, 'Staging environment');
-          }
-        })
-      }
-    }
-  };
-}
+  describe('Environments', function () {
+
+    describe('Updating environment with member', function () {
+      var ret = {};
+
+      before(macro.patch('/orgs/confyio/projects/main/envs/production', {
+        description: 'Main production environment',
+        random: '1i3je738ujf',
+        org: 'hacked'
+      }, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return the environment', function () {
+        assert.equal(ret.body._id, 'orgs/confyio/projects/main/envs/production');
+        assert.equal(ret.body.name, 'Production');
+        assert.equal(ret.body.description, 'Main production environment');
+        assert.equal(ret.body.project, 'main')
+        assert.equal(ret.body.org, 'confyio');
+        assert.equal(ret.body.type, 'env');
+      });
+
+      it('should not update random fields', function () {
+        assert.isUndefined(ret.body.random);
+      });
+
+      it('should not return config', function () {
+        assert.isUndefined(ret.body.config);
+      });
+
+      it('should not return versions', function () {
+        assert.isUndefined(ret.body.versions);
+      });
+
+      describe('should update environment doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/projects/main/envs/production', ret));
+
+        it('should have updated description', function () {
+          assert.equal(ret.body.description, 'Main production environment');
+        });
+      });
+    });
+
+    describe('Updating environment with no access', function () {
+      var ret = {};
+
+      before(macro.patch('/orgs/confyio/projects/main/envs/staging', {
+        description: 'Seriously!',
+      }, {user: 'vanstee', pass: 'password'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+
+      describe('should not update environment doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/projects/main/envs/staging', ret));
+
+        it('should have old description', function () {
+          assert.equal(ret.body.description, 'Staging environment');
+        });
+      });
+    });
+  });
+};

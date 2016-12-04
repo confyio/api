@@ -1,117 +1,161 @@
 var request = require('request')
-  , assert = require('assert')
-  , nano = require('nano')('http://localhost:5984').db.use('confy-test')
-  , redis = require('redis').createClient();
+  , assert = require('chai').assert
+  , nano = require('nano')(process.env.CLOUDANT_URL || 'http://localhost:5984')
+  , redis = require('redis').createClient({url: process.env.REDISCLOUD_URL || 'redis://localhost:6379'});
+
+nano = nano.db.use('confy-test');
 
 module.exports = {
-  get: function (path, auth, callback) {
-    request({
-      url: 'http://localhost:5000' + path,
-      method: 'GET',
-      auth: auth,
-      json: true
-    }, callback);
-  },
-  post: function (path, body, auth, callback) {
-    request({
-      url: 'http://localhost:5000' + path,
-      method: 'POST',
-      body: body,
-      auth: auth,
-      json: true
-    }, callback);
-  },
-  patch: function (path, body, auth, callback) {
-    request({
-      url: 'http://localhost:5000' + path,
-      method: 'PATCH',
-      body: body,
-      auth: auth,
-      json: true
-    }, callback);
-  },
-  put: function (path, body, auth, callback) {
-    request({
-      url: 'http://localhost:5000' + path,
-      method: 'PUT',
-      body: body,
-      auth: auth,
-      json: true
-    }, callback);
-  },
-  delete: function (path, body, auth, callback) {
-    request({
-      url: 'http://localhost:5000' + path,
-      method: 'DELETE',
-      body: body,
-      auth: auth,
-      json: true
-    }, callback);
-  },
-  db: function (doc, callback) {
-    nano.get(doc, callback);
-  },
-  doc: function (doc, extra) {
-    extra = extra || {};
+  get: function (path, auth, ret) {
+    return function (done) {
+      request({
+        url: 'http://localhost:5000' + path,
+        method: 'GET',
+        auth: auth,
+        json: true
+      }, function (err, res, body) {
+        if (err) return done(err);
 
-    var ret = {
-      topic: function () {
-        nano.get(doc, this.callback)
-      },
-      'should exist': function (err, body) {
-        assert.isNull(err);
-        assert.equal(body._id, doc);
-      }
+        ret.res = res;
+        ret.body = body;
+        done();
+      });
     };
+  },
+  post: function (path, body, auth, ret, lambda) {
+    return function (done) {
+      request({
+        url: 'http://localhost:5000' + path,
+        method: 'POST',
+        body: body,
+        auth: auth,
+        json: true
+      }, function (err, res, body) {
+        if (err) return done(err);
 
-    Object.keys(extra).forEach(function (key) {
-      ret[key] = extra[key];
-    });
+        ret.res = res;
+        ret.body = body;
 
-    return ret;
+        if (lambda) lambda();
+
+        done();
+      });
+    };
+  },
+  patch: function (path, body, auth, ret, lambda) {
+    return function (done) {
+      request({
+        url: 'http://localhost:5000' + path,
+        method: 'PATCH',
+        body: body,
+        auth: auth,
+        json: true
+      }, function (err, res, body) {
+        if (err) return done(err);
+
+        ret.res = res;
+        ret.body = body;
+
+        if (lambda) lambda();
+
+        done();
+      });
+    };
+  },
+  put: function (path, body, auth, ret) {
+    return function (done) {
+      request({
+        url: 'http://localhost:5000' + path,
+        method: 'PUT',
+        body: body,
+        auth: auth,
+        json: true
+      }, function (err, res, body) {
+        if (err) return done(err);
+
+        ret.res = res;
+        ret.body = body;
+        done();
+      });
+    };  },
+  delete: function (path, body, auth, ret) {
+    return function (done) {
+      request({
+        url: 'http://localhost:5000' + path,
+        method: 'DELETE',
+        body: body,
+        auth: auth,
+        json: true
+      }, function (err, res, body) {
+        if (err) return done(err);
+
+        ret.res = res;
+        ret.body = body;
+        done();
+      });
+    };
+  },
+  doc: function (doc, ret, lambda) {
+    return function (done) {
+      nano.get(doc, function (err, body) {
+        if (err) return done(err);
+
+        assert.equal(body._id, doc);
+        ret.body = body;
+
+        if (lambda) lambda();
+
+        done();
+      });
+    };
   },
   nodoc: function (doc, reason) {
-    return {
-      topic: function () {
-        nano.get(doc, this.callback)
-      },
-      'should not exist': function (err, body) {
+    return function (done) {
+      nano.get(doc, function (err, body) {
         assert.isNotNull(err);
         assert.equal(err.reason, reason);
         assert.isUndefined(body);
-      }
+
+        done();
+      });
     };
   },
-  status: function (code) {
-    return function (err, res) {
-      assert.isNull(err);
-      assert.equal(res.statusCode, code);
-    }
+  status: function (code, ret) {
+    it('should return ' + code, function () {
+      assert.equal(ret.res.statusCode, code);
+    });
   },
-  validation: function (number, errors) {
-    errors = errors || [];
-
-    return function (err, res, body) {
-      assert.equal(body.message, 'Validation failed');
-      assert.lengthOf(body.errors, number);
+  validation: function (number, errors, ret) {
+    it('should return validation errors', function () {
+      assert.equal(ret.body.message, 'Validation failed');
+      assert.lengthOf(ret.body.errors, number);
 
       errors.forEach(function (item, index) {
-        assert.deepEqual(body.errors[index], { field: item[0], code: item[1] });
+        assert.deepEqual(ret.body.errors[index], { field: item[0], code: item[1] });
       });
-    }
+    });
   },
   redis: function (count, text) {
-    var ret = {
-      topic: function () {
-        redis.keys('*', this.callback);
-      }
-    };
+    return function () {
+      it('should result in ' + text + ' keys', function (done) {
 
-    ret['should result in ' + text + ' keys'] = function (err, body) {
-      assert.isNull(err);
-      assert.equal(body.length, count);
-    };
+        redis.keys('*', function (err, body) {
+          if (err) return done(err);
 
-    return ret;
+          assert.equal(body.length, count);
+          done();
+        });
+      });
+    };
+  },
+  redisget: function (key, ret) {
+    return function (done) {
+      redis.get(key, function (err, body) {
+        if (err) return done(err);
+
+        ret.body = body;
+        done();
+      });
+    };
   }
-}
+};

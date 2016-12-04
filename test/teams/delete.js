@@ -1,78 +1,123 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Teams': {
-      'Deleting non-existent team': {
-        topic: function () {
-          macro.delete('/orgs/confyio/teams/stuff', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        }
-      },
-      'Deleting the default team': {
-        topic: function () {
-          macro.delete('/orgs/confyio/teams/owners', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1, [['team', 'forbidden']])
-      },
-      'Deleting team with owner': {
-        topic: function () {
-          macro.delete('/orgs/confyio/teams/consultants', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 204': macro.status(204),
-        'should not return the team': function (err, res, body) {
-          assert.isUndefined(body);
-        },
-        'should delete team doc and it': macro.nodoc('orgs/confyio/teams/consultants', 'deleted'),
-        'should update project doc and it': macro.doc('orgs/confyio/projects/knowledge-base', {
-          'should remove team from team list': function (err, body) {
-            assert.isUndefined(body.teams['consultants']);
-          },
-          'should decrement the count for the users': function (err, body) {
-            assert.isUndefined(body.users['vanstee']);
-            assert.equal(body.users['pksunkara'], 1);
-          }
-        }),
-        'should update org doc and it': macro.doc('orgs/confyio', {
-          'should decrement the count for the users': function (err, body) {
-            assert.isUndefined(body.users['vanstee']);
-            assert.equal(body.users['pksunkara'], 3);
-          }
-        })
-      },
-      'Deleting team with member': {
-        topic: function () {
-          macro.delete('/orgs/confyio/teams/designers', {}, {user: 'shea', pass: 'password'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Bad credentials'});
-        },
-        'should not delete team doc and it': macro.doc('orgs/confyio/teams/designers')
-      },
-      'Deleting team with no access': {
-        topic: function () {
-          macro.delete('/orgs/confyio/teams/designers', {}, {user: 'jsmith', pass: 'secret'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        },
-        'should not delete team doc and it': macro.doc('orgs/confyio/teams/designers')
-      },
-      'Deleting team with heroku user': {
-        topic: function () {
-          macro.delete('/orgs/app123/teams/owners', {}, {user: 'app123', pass: 'password'}, this.callback);
-        },
-        'should return 403': macro.status(403),
-        'should return forbidden': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Forbidden action'});
-        }
-      }
-    }
-  };
-}
+  describe('Teams', function () {
+
+    describe('Deleting non-existent team', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio/teams/stuff', {}, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+    });
+
+    describe('Deleting the default team', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio/teams/owners', {}, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(422, ret);
+      macro.validation(1, [['team', 'forbidden']], ret);
+    });
+
+    describe('Deleting team with owner', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio/teams/consultants', {}, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(204, ret);
+
+      it('should not return the team', function () {
+        assert.isUndefined(ret.body);
+      });
+
+      it('should delete team doc', macro.nodoc('orgs/confyio/teams/consultants', 'deleted'));
+
+      describe('should update project doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/projects/knowledge-base', ret));
+
+        it('should remove team from team list', function () {
+          assert.isUndefined(ret.body.teams['consultants']);
+        });
+
+        it('should decrement the count for the users', function () {
+          assert.isUndefined(ret.body.users['vanstee']);
+          assert.equal(ret.body.users['pksunkara'], 1);
+        });
+      });
+
+      describe('should update org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio', ret));
+
+        it('should decrement the count for the users', function () {
+          assert.isUndefined(ret.body.users['vanstee']);
+          assert.equal(ret.body.users['pksunkara'], 3);
+        });
+      });
+    });
+
+    describe('Deleting team with member', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio/teams/designers', {}, {user: 'shea', pass: 'password'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {message: 'Bad credentials'});
+      });
+
+      describe('should not delete team doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/teams/designers', ret));
+
+        it('should exist', function () {
+          assert.isDefined(ret.body);
+        });
+      });
+    });
+
+    describe('Deleting team with no access', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio/teams/designers', {}, {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+
+      describe('should not delete team doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/teams/designers', ret));
+
+        it('should exist', function () {
+          assert.isDefined(ret.body);
+        });
+      });
+    });
+
+    describe('Deleting team with heroku user', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/app123/teams/owners', {}, {user: 'app123', pass: 'password'}, ret));
+
+      macro.status(403, ret);
+
+      it('should return forbidden', function () {
+        assert.deepEqual(ret.body, {'message':'Forbidden action'});
+      });
+    });
+  });
+};

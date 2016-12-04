@@ -1,47 +1,56 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Users': {
-      'Retrieving authenticated user': {
-        topic: function () {
-          macro.get('/user', {user: 'jsmith', pass: 'secret'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return the user': function (err, res, body) {
-          assert.equal(body._id, 'users/jsmith');
-          assert.equal(body.username, 'jsmith');
-          assert.equal(body.fullname, 'John Kay Smith');
-          assert.equal(body.email, 'john.smith@gmail.com');
-          assert.equal(body.type, 'user');
-          assert.isTrue(body.verified);
-        },
-        'should not retun password': function (err, res, body) {
-          assert.isUndefined(body.password);
-        },
-        'should not retun verification token': function (err, res, body) {
-          assert.isUndefined(body.verification_token);
-          assert.isUndefined(body.verify_new_email);
-        }
-      },
-      'Retrieving non-existent user': {
-        topic: function () {
-          macro.get('/user', {user: 'pavan', pass: 'secret'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Bad credentials'});
-        }
-      },
-      'Retrieving user with wrong password': {
-        topic: function () {
-          macro.get('/user', {user: 'jsmith', pass: 'secret1'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Bad credentials'});
-        }
-      }
-    }
-  }
-}
+  describe('Users', function () {
+
+    describe('Retrieving authenticated user', function () {
+      var ret = {};
+
+      before(macro.get('/user', {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return the user', function () {
+        assert.equal(ret.body._id, 'users/jsmith');
+        assert.equal(ret.body.username, 'jsmith');
+        assert.equal(ret.body.fullname, 'John Kay Smith');
+        assert.equal(ret.body.email, 'john.smith@gmail.com');
+        assert.equal(ret.body.type, 'user');
+        assert.isTrue(ret.body.verified);
+      });
+
+      it('should not retun password', function () {
+        assert.isUndefined(ret.body.password);
+      });
+
+      it('should not retun verification token', function () {
+        assert.isUndefined(ret.body.verification_token);
+        assert.isUndefined(ret.body.verify_new_email);
+      });
+    });
+
+    describe('Retrieving non-existent user', function () {
+      var ret = {};
+
+      before(macro.get('/user', {user: 'pavan', pass: 'secret'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {'message':'Bad credentials'});
+      });
+    });
+
+    describe('Retrieving user with wrong password', function () {
+      var ret = {};
+
+      before(macro.get('/user', {user: 'jsmith', pass: 'secret1'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {'message':'Bad credentials'});
+      });
+    });
+  });
+};

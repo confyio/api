@@ -1,55 +1,68 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Environment Configuration': {
-      'Retrieving them with non-member': {
-        topic: function () {
-          macro.get('/orgs/confyio/projects/main/envs/production/config', {user: 'jsmith', pass: 'secret'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        }
-      },
-      'Retrieving them with member': {
-        topic: function () {
-          macro.get('/orgs/confyio/projects/main/envs/production/config', {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return config doc': function (err, res, body) {
-          assert.isUndefined(body._id);
-          assert.equal(body.port, 5000);
-        }
-      },
-      'Retrieving via token': {
-        topic: function () {
-          macro.get('/orgs/confyio/config/e3badca8afdcb3cc2603666865cd0eb66c011ee8', null, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return config doc': function (err, res, body) {
-          assert.isUndefined(body._id);
-          assert.deepEqual(body, 'EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==')
-        }
-      },
-      'Retrieving via non existent token': {
-        topic: function () {
-          macro.get('/orgs/confyio/config/a3badca8afdcb3cc2603666865cd0eb66c011ee8', null, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        }
-      },
-      'Retrieving via non matching org': {
-        topic: function () {
-          macro.get('/orgs/fire-size/config/a3badca8afdcb3cc2603666865cd0eb66c011ee8', null, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        }
-      }
-    }
-  };
-}
+  describe('Environment Configuration', function () {
+
+    describe('Retrieving them with non-member', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/projects/main/envs/production/config', {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+    });
+
+    describe('Retrieving them with member', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/projects/main/envs/production/config', {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return config doc', function () {
+        assert.isUndefined(ret.body._id);
+        assert.equal(ret.body.port, 5000);
+      });
+    });
+
+    describe('Retrieving via token', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/config/e3badca8afdcb3cc2603666865cd0eb66c011ee8', null, ret));
+
+      macro.status(200, ret);
+
+      it('should return config doc', function () {
+        assert.isUndefined(ret.body._id);
+        assert.deepEqual(ret.body, 'EWcdL4M3UHUsdpYZKZTnYQ==RDsiGWvifNeWqrLKz9MDRQ==')
+      });
+    });
+
+    describe('Retrieving via non existent token', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/confyio/config/a3badca8afdcb3cc2603666865cd0eb66c011ee8', null, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+    });
+
+    describe('Retrieving via non matching org', function () {
+      var ret = {};
+
+      before(macro.get('/orgs/fire-size/config/a3badca8afdcb3cc2603666865cd0eb66c011ee8', null, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+    });
+  });
+};

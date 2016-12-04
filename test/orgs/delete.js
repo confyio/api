@@ -1,66 +1,100 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Orgs': {
-      'Deleting non-existent org': {
-        topic: function () {
-          macro.delete('/orgs/assembly', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        }
-      },
-      'Deleting the default org': {
-        topic: function () {
-          macro.delete('/orgs/pksunkara', {}, {user: 'pksunkara', pass: 'password'}, this.callback);
-        },
-        'should return 422': macro.status(422),
-        'should return validation errors': macro.validation(1, [['org', 'forbidden']])
-      },
-      'Deleting org with owner': {
-        topic: function () {
-          macro.delete('/orgs/fire-size', {}, {user: 'jsmith', pass: 'secret'}, this.callback);
-        },
-        'should return 204': macro.status(204),
-        'should not return the org': function (err, res, body) {
-          assert.isUndefined(body);
-        },
-        'should delete org doc and it': macro.nodoc('orgs/fire-size', 'deleted'),
-        'should delete project doc and it': macro.nodoc('orgs/fire-size/projects/main-app', 'deleted'),
-        'should delete team doc and it': macro.nodoc('orgs/fire-size/teams/dev-gods', 'deleted'),
-        'should delete environment doc and it': macro.nodoc('orgs/fire-size/projects/main-app/envs/production', 'deleted')
-      },
-      'Deleting org with member': {
-        topic: function () {
-          macro.delete('/orgs/confyio', {}, {user: 'shea', pass: 'password'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Bad credentials'});
-        },
-        'should not delete org doc and it': macro.doc('orgs/confyio')
-      },
-      'Deleting org with no access': {
-        topic: function () {
-          macro.delete('/orgs/confyio', {}, {user: 'jsmith', pass: 'secret'}, this.callback);
-        },
-        'should return 404': macro.status(404),
-        'should return not found': function (err, res, body) {
-          assert.deepEqual(body, {message: 'Not found'});
-        },
-        'should not delete org doc and it': macro.doc('orgs/confyio')
-      },
-      'Deleting org with heroku user': {
-        topic: function () {
-          macro.delete('/orgs/app123', {}, {user: 'app123', pass: 'password'}, this.callback);
-        },
-        'should return 403': macro.status(403),
-        'should return forbidden': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Forbidden action'});
-        }
-      }
-    }
-  };
+  describe('Orgs', function () {
+    
+    describe('Deleting non-existent org', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/assembly', {}, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+    });
+    
+    describe('Deleting the default org', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/pksunkara', {}, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(422, ret);
+      macro.validation(1, [['org', 'forbidden']], ret);
+    });
+    
+    describe('Deleting org with owner', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/fire-size', {}, {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(204, ret);
+
+      it('should not return the org', function () {
+        assert.isUndefined(ret.body);
+      });
+
+      it('should delete org doc', macro.nodoc('orgs/fire-size', 'deleted'));
+      it('should delete project doc', macro.nodoc('orgs/fire-size/projects/main-app', 'deleted'));
+      it('should delete team doc', macro.nodoc('orgs/fire-size/teams/dev-gods', 'deleted'));
+      it('should delete environment doc', macro.nodoc('orgs/fire-size/projects/main-app/envs/production', 'deleted'));
+    });
+    
+    describe('Deleting org with member', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio', {}, {user: 'shea', pass: 'password'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {message: 'Bad credentials'});
+      });
+      
+      describe('should not delete org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio', ret));
+
+        it('should exist', function () {
+          assert.isDefined(ret.body);
+        });
+      });
+    });
+    
+    describe('Deleting org with no access', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/confyio', {}, {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(404, ret);
+
+      it('should return not found', function () {
+        assert.deepEqual(ret.body, {message: 'Not found'});
+      });
+      
+      describe('should not delete org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio', ret));
+
+        it('should exist', function () {
+          assert.isDefined(ret.body);
+        });
+      });
+    });
+    
+    describe('Deleting org with heroku user', function () {
+      var ret = {};
+
+      before(macro.delete('/orgs/app123', {}, {user: 'app123', pass: 'password'}, ret));
+
+      macro.status(403, ret);
+
+      it('should return forbidden', function () {
+        assert.deepEqual(ret.body, {'message':'Forbidden action'});
+      });
+    });
+  });
 }

@@ -78,7 +78,7 @@ module.exports = function (app) {
       name: 'App', description: 'Heroku application', users: {}
     };
 
-    project.users[user.username] = true;
+    project.users[user.username] = 1;
 
     var tmp = app.bulk.user(user);
     var token = crypto.randomBytes(20).toString('hex');

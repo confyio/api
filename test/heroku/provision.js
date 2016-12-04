@@ -1,77 +1,117 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Heroku': {
-      'Provisioning them without auth': {
-        topic: function () {
-          macro.post('/heroku/resources', {
-            heroku_id: 'app456@heroku.com',
-          }, {user:'app123', pass:'password'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Bad credentials'});
-        }
-      },
-      'Provisioning them with proper auth': {
-        topic: function () {
-          macro.post('/heroku/resources', {
-            heroku_id: 'app456@heroku.com',
-          }, {user:'confy', pass:'thisisasampleherokuaddonpassword'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should return response': function (err, res, body) {
-          assert.equal(body.id, 'app456');
-          assert.equal(body.config.CONFY_URL.substr(0, 14), 'http://app456:');
-          assert.equal(body.config.CONFY_URL.substr(34), '@localhost:5000/heroku/config');
-        },
-        'should create user doc and it': macro.doc('users/app456', {
-          'should be verified': function (err, body) {
-            assert.isTrue(body.verified);
-          },
-          'should be a heroku user': function (err, body) {
-            assert.isTrue(body.heroku);
-          }
-        }),
-        'should create default org doc and it': macro.doc('orgs/app456', {
-          'should be default for user': function (err, body) {
-            assert.equal(body.name, 'app456');
-            assert.equal(body.type, 'org');
-          },
-          'should have user as owner': function (err, body) {
-            assert.equal(body.owner, 'app456');
-          },
-          'should have user email as billing email': function (err, body) {
-            assert.equal(body.email, 'app456@heroku.com');
-          },
-          'should have user in list of users': function (err, body) {
-            assert.deepEqual(body.users, {app456: 1});
-          },
-          'should be on heroku plan': function (err, body) {
-            assert.equal(body.plan, 'heroku');
-          }
-        }),
-        'should create default team doc and it': macro.doc('orgs/app456/teams/owners', {
-          'should be default for org': function (err, body) {
-            assert.equal(body.name, 'Owners');
-            assert.equal(body.type, 'team');
-            assert.equal(body.description, 'Has access to all projects');
-          },
-          'should have user in list of users': function (err, body) {
-            assert.deepEqual(body.users, {app456: true});
-          }
-        }),
-        'should create project doc and it': macro.doc('orgs/app456/projects/app', {
-          'should have users from "owners" team': function (err, body) {
-            assert.deepEqual(body.users, {app456: 1});
-          },
-          'should have access for default team': function (err, body) {
-            assert.deepEqual(body.teams, {owners: true});
-          }
-        }),
-        'should create env doc and it': macro.doc('orgs/app456/projects/app/envs/production')
-      }
-    }
-  };
-}
+  describe('Heroku', function () {
+
+    describe('Provisioning them without auth', function () {
+      var ret = {};
+
+      before(macro.post('/heroku/resources', {
+        heroku_id: 'app456@heroku.com',
+      }, {user:'app123', pass:'password'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {'message':'Bad credentials'});
+      });
+    });
+
+    describe('Provisioning them with proper auth', function () {
+      var ret = {};
+
+      before(macro.post('/heroku/resources', {
+        heroku_id: 'app456@heroku.com',
+      }, {user:'confy', pass:'thisisasampleherokuaddonpassword'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return response', function () {
+        assert.equal(ret.body.id, 'app456');
+        assert.equal(ret.body.config.CONFY_URL.substr(0, 14), 'http://app456:');
+        assert.equal(ret.body.config.CONFY_URL.substr(34), '@localhost:5000/heroku/config');
+      });
+
+      describe('should create user doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('users/app456', ret));
+
+        it('should be verified', function () {
+          assert.isTrue(ret.body.verified);
+        });
+
+        it('should be a heroku user', function () {
+          assert.isTrue(ret.body.heroku);
+        });
+      });
+
+      describe('should create default org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/app456', ret));
+
+        it('should be default for user', function () {
+          assert.equal(ret.body.name, 'app456');
+          assert.equal(ret.body.type, 'org');
+        });
+
+        it('should have user as owner', function () {
+          assert.equal(ret.body.owner, 'app456');
+        });
+
+        it('should have user email as billing email', function () {
+          assert.equal(ret.body.email, 'app456@heroku.com');
+        });
+
+        it('should have user in list of users', function () {
+          assert.deepEqual(ret.body.users, {app456: 1});
+        });
+
+        it('should be on heroku plan', function () {
+          assert.equal(ret.body.plan, 'heroku');
+        });
+      });
+
+      describe('should create default team doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/app456/teams/owners', ret));
+
+        it('should be default for org', function () {
+          assert.equal(ret.body.name, 'Owners');
+          assert.equal(ret.body.type, 'team');
+          assert.equal(ret.body.description, 'Has access to all projects');
+        });
+
+        it('should have user in list of users', function () {
+          assert.deepEqual(ret.body.users, {app456: true});
+        });
+      });
+
+      describe('should create project doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/app456/projects/app', ret));
+
+        it('should have users from "owners" team', function () {
+          assert.deepEqual(ret.body.users, {app456: 1});
+        });
+
+        it('should have access for default team', function () {
+          assert.deepEqual(ret.body.teams, {owners: true});
+        });
+      });
+
+      describe('should create env doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/app456/projects/app/envs/production', ret));
+
+        it('should exist', function () {
+          assert.isDefined(ret.body);
+        });
+      });
+    });
+  });
+};

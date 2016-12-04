@@ -59,7 +59,7 @@ components:
     containers:
       - source: replicated
         image_name: confy
-        version: "0.1.3"
+        version: "0.1.4"
         ephemeral: true
         cmd: '["node", "test/setup.js"]'
         publish_events:
@@ -79,7 +79,7 @@ components:
     containers:
       - source: replicated
         image_name: confy
-        version: "0.1.2"
+        version: "0.1.4"
         publish_events:
           - name: API Server started
             trigger: container-start
@@ -111,13 +111,17 @@ components:
     containers:
       - source: replicated
         image_name: web
-        version: "0.1.1"
+        version: "0.1.4"
         publish_events:
           - name: Frontend started
             trigger: port-listen
             data: "80"
             subscriptions: []
         env_vars:
+          - name: BASE_URL
+            static_val: "http://{{repl ConfigOption \"hostname\"}}:5000"
+          - name: SSL
+            static_val: "0"
         restart:
           policy: always
         ports:
@@ -151,3 +155,10 @@ config:
         type: text
         default: "password"
         required: true
+monitors:
+  cpuacct:
+  - DB,couchdb
+  - Backend,confy
+  memory:
+  - DB,couchdb
+  - Backend,confy

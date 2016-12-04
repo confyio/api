@@ -1,0 +1,21 @@
+image: node:6
+cache:
+  paths:
+    - node_modules/
+services:
+  - redis:alpine
+  - couchdb:1.6
+after_script:
+  - bash <(curl -s https://codecov.io/bash) -t 2728d9bd-457e-4644-92f1-7e18ed948dff
+stages:
+  - test
+variables:
+  REDISCLOUD_URL: redis://redis:6379
+  CLOUDANT_URL: http://couchdb:5984
+test:
+  stage: test
+  script:
+    - npm install
+    - npm run cover
+  tags:
+    - docker

@@ -1,30 +1,34 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Heroku': {
-      'Deprovisioning them without auth': {
-        topic: function () {
-          macro.delete('/heroku/resources/app456', {}, {user:'app123', pass:'password'}, this.callback);
-        },
-        'should return 401': macro.status(401),
-        'should return bad credentials': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Bad credentials'});
-        }
-      },
-      'Deprovisioning them with proper auth': {
-        topic: function () {
-          macro.delete('/heroku/resources/app456', {}, {
-            user:'confy', pass:'thisisasampleherokuaddonpassword'
-          }, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should delete user doc and it': macro.nodoc('users/app456', 'deleted'),
-        'should delete org doc and it': macro.nodoc('orgs/app456', 'deleted'),
-        'should delete project doc and it': macro.nodoc('orgs/app456/projects/app', 'deleted'),
-        'should delete team doc and it': macro.nodoc('orgs/app456/teams/owners', 'deleted'),
-        'should delete environment doc and it': macro.nodoc('orgs/app456/projects/app/envs/production', 'deleted')
-      }
-    }
-  };
-}
+  describe('Heroku', function () {
+
+    describe('Deprovisioning them without auth', function () {
+      var ret = {};
+
+      before(macro.delete('/heroku/resources/app456', {}, {user:'app123', pass:'password'}, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {'message':'Bad credentials'});
+      });
+    });
+
+    describe('Deprovisioning them with proper auth', function () {
+      var ret = {};
+
+      before(macro.delete('/heroku/resources/app456', {}, {
+        user:'confy', pass:'thisisasampleherokuaddonpassword'
+      }, ret));
+
+      macro.status(200, ret);
+
+      it('should delete user doc', macro.nodoc('users/app456', 'deleted'));
+      it('should delete org doc', macro.nodoc('orgs/app456', 'deleted'));
+      it('should delete project doc', macro.nodoc('orgs/app456/projects/app', 'deleted'));
+      it('should delete team doc', macro.nodoc('orgs/app456/teams/owners', 'deleted'));
+      it('should delete environment doc', macro.nodoc('orgs/app456/projects/app/envs/production', 'deleted'));
+    });
+  });
+};

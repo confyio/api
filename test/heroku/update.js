@@ -1,41 +1,51 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 module.exports = function (macro) {
-  return {
-    'Heroku': {
-      'Updating config with non-heroku user': {
-        topic: function () {
-          macro.put('/heroku/config', {}, {user:'jsmith', pass:'secret'}, this.callback);
-        },
-        'should return 403': macro.status(403),
-        'should return forbidden': function (err, res, body) {
-          assert.deepEqual(body, {'message':'Forbidden action'});
-        }
-      },
-      'Updating config with heroku user': {
-        topic: function () {
-          macro.put('/heroku/config', {
-            port: null, db: 'pavan'
-          }, {user:'app123', pass:'password'}, this.callback);
-        },
-        'should return 200': macro.status(200),
-        'should update the env doc and it': macro.doc('orgs/app123/projects/app/envs/production', {
-          'should have update config': function (err, body) {
-            assert.isNull(body.config.port);
-            assert.equal(body.config.db, 'pavan');
-          },
-          'should have added the new versions': function (err, body) {
-            assert.equal(body.versions.length, 10);
-            assert.isNull(body.versions[0].config.port);
-            assert.equal(body.versions[0].config.db, 'pavan');
-          },
-          'should have removed the old versions': function (err, body) {
-            assert.equal(body.versions.length, 10);
-            assert.equal(body.versions[9].config.port, 8008);
-            assert.equal(body.versions[9].time, 1427633285584);
-          }
-        })
-      }
-    }
-  };
-}
+  describe('Heroku', function () {
+
+    describe('Updating config with non-heroku user', function () {
+      var ret = {};
+
+      before(macro.put('/heroku/config', {}, {user:'jsmith', pass:'secret'}, ret));
+
+      macro.status(403, ret);
+
+      it('should return forbidden', function () {
+        assert.deepEqual(ret.body, {'message':'Forbidden action'});
+      });
+    });
+
+    describe('Updating config with heroku user', function () {
+      var ret = {};
+
+      before(macro.put('/heroku/config', {
+        port: null, db: 'pavan'
+      }, {user:'app123', pass:'password'}, ret));
+
+      macro.status(200, ret);
+
+      describe('should update the env doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/app123/projects/app/envs/production', ret));
+
+        it('should have update config', function () {
+          assert.isNull(ret.body.config.port);
+          assert.equal(ret.body.config.db, 'pavan');
+        });
+
+        it('should have added the new versions', function () {
+          assert.equal(ret.body.versions.length, 10);
+          assert.isNull(ret.body.versions[0].config.port);
+          assert.equal(ret.body.versions[0].config.db, 'pavan');
+        });
+
+        it('should have removed the old versions', function () {
+          assert.equal(ret.body.versions.length, 10);
+          assert.equal(ret.body.versions[9].config.port, 8008);
+          assert.equal(ret.body.versions[9].time, 1427633285584);
+        });
+      });
+    });
+  });
+};
