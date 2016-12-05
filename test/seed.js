@@ -14,7 +14,7 @@ module.exports = {
           "map": "function(doc) {\n\tif (doc.type == 'env') {\n\t\temit(doc.org + '/' + doc.project + '/' + doc.name.toLowerCase().replace(/\\ /g, '-'), doc);\n\t}\n}"
         },
         "token": {
-          "map": "function(doc) {\n\tif (doc.type == 'env') {\n\t\temit(doc.token, doc);\n\t}\n}"
+          "map": "function(doc) {\n\tif (doc.type == 'env') {\n\t\temit(doc.org + '/' + doc.token, doc);\n\t}\n}"
         }
       }
     },

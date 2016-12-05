@@ -6,7 +6,7 @@ module.exports = function (app, db) {
   app.post('/orgs/:orgname/projects/:project/envs/:env/token', app.auth.project, function (req, res, next) {
 
     // Get unique token
-    tokenUnique(db, function (err, token) {
+    tokenUnique(req.org.name, db, function (err, token) {
       if (err) return next(err);
 
       req.env.token = token;

@@ -1,15 +1,15 @@
 var crypto = require('crypto');
 
-var tokenUnique = function (db, next) {
+var tokenUnique = function (org, db, next) {
   var token = crypto.randomBytes(20).toString('hex');
 
-  db.view('envs', 'token', {keys: [token]}, function (err, body) {
+  db.view('envs', 'token', {keys: [org + '/' + token]}, function (err, body) {
     if (err) return next(err);
 
     if (body.rows.length == 0) {
       return next(null, token);
     } else {
-      return tokenUnique(db, next);
+      return tokenUnique(org, db, next);
     }
   });
 };
@@ -44,7 +44,7 @@ module.exports = function (app, db) {
         return app.errors.validation(res, [{ field: 'name', code: 'already_exists' }]);
       }
 
-      tokenUnique(db, function (err, token) {
+      tokenUnique(req.org.name, db, function (err, token) {
         if (err) return next(err);
 
         req.body.type = 'env';

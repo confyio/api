@@ -33,7 +33,7 @@ var update = function (app, db) {
 module.exports = function (app, db) {
 
   app.get('/orgs/:orgname/config/:token', function (req, res, next) {
-    db.view('envs', 'token', {keys: [req.params.token]}, function (err, body) {
+    db.view('envs', 'token', {keys: [req.org.name + '/' + req.params.token]}, function (err, body) {
       if (err || body.rows.length != 1) return next(err);
 
       if (body.rows[0].value.org != req.org.name) {

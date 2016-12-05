@@ -36,7 +36,7 @@ module.exports = function (app, db) {
           req.body.users[user] = 1;
         });
 
-        tokenUnique(db, function (err, token) {
+        tokenUnique(req.org.name, db, function (err, token) {
           if (err) return next(err);
 
           // Insert project
