@@ -4,6 +4,30 @@ var assert = require('chai').assert
 module.exports = function (macro) {
   describe('Users', function () {
 
+    describe('Logging out user without access token', function () {
+      var ret = {};
+
+      before(macro.get('/user/logout', {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(204, ret);
+
+      it('should not return anything', function () {
+        assert.isUndefined(ret.body);
+      });
+
+      describe('and reading the access token from redis', function () {
+        var ret = {};
+
+        before(macro.redisget('confy_43fb9585328895005ca74bb33a1c46db5b835f2d', ret));
+
+        it('should return something', function () {
+          assert.isDefined(ret.body);
+        });
+
+        describe('and counting redis keys', macro.redis(3, 'three'));
+      });
+    });
+
     describe('Logging out user', function () {
       var ret = {};
 
@@ -11,7 +35,7 @@ module.exports = function (macro) {
 
       macro.status(204, ret);
 
-      it('should not return the token', function () {
+      it('should not return anything', function () {
         assert.isUndefined(ret.body);
       });
 

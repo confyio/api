@@ -76,6 +76,18 @@ module.exports = function (macro) {
       });
     });
 
+    describe('Logging in user with token', function () {
+      var ret = {};
+
+      before(macro.post('/user/login?access_token=43fb9585328895005ca74bb33a1c46db5b835f2d', {}, null, ret));
+
+      macro.status(401, ret);
+
+      it('should return bad credentials', function () {
+        assert.deepEqual(ret.body, {'message':'Bad credentials'});
+      });
+    });
+
     describe('Logging in user', function () {
       var ret = {}, token;
 
