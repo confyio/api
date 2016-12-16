@@ -34,10 +34,28 @@ module.exports = function (app, db) {
       return app.errors.auth(res);
     }
 
-    app.utils.permit(req, ['email', 'fullname']);
+    if (req.body.newPassword) {
+      req.body.password = req.body.newPassword;
+    }
 
-    if (!validator.isEmail(req.body.email)) {
-      return app.errors.validation(res, [{ field: 'email', code: 'invalid' }]);
+    app.utils.permit(req, ['email', 'fullname', 'password']);
+
+    var errs = [];
+
+    if (req.body.password && (typeof req.body.password !== 'string' || req.body.password.length < 6)) {
+      errs.push({ field: 'newPassword', code: 'insecure' });
+    }
+
+    if (req.body.email && !validator.isEmail(req.body.email)) {
+      errs.push({ field: 'email', code: 'invalid' });
+    }
+
+    if (errs.length > 0) {
+      return app.errors.validation(res, errs);
+    }
+
+    if (req.body.password) {
+      req.body.password = app.bulk.cryptPass(req.body.password);
     }
 
     // If updating email, send verification email

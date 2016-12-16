@@ -1,12 +1,12 @@
 var bcrypt = require('bcrypt')
   , crypto = require('crypto');
 
-var cryptPass = function (password) {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-};
-
 module.exports = function (app) {
   app.bulk = {};
+
+  app.bulk.cryptPass = function (password) {
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+  };
 
   app.bulk.env = function (env, project, token) {
     env.type = 'env';
@@ -59,7 +59,7 @@ module.exports = function (app) {
   };
 
   app.bulk.user = function (user) {
-    user.password = cryptPass(user.password);
+    user.password = app.bulk.cryptPass(user.password);
     user.type = 'user';
     user._id = 'users/' + user.username;
 

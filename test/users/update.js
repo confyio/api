@@ -138,8 +138,7 @@ module.exports = function (macro) {
       var ret = {}, token;
 
       before(macro.patch('/user', {
-        fullname: 'Patrick van Stee',
-        email: 'patrick@vanstee.me'
+        fullname: 'Patrick van Stee'
       }, {user: 'vanstee', pass: 'password'}, ret, function () {
         token = ret.body.token;
       }));
@@ -210,6 +209,130 @@ module.exports = function (macro) {
       });
 
       describe('and counting redis keys', macro.redis(4, 'four'));
+    });
+
+    describe('Updating user with invalid email', function () {
+      var ret = {};
+
+      before(macro.patch('/user', {
+        newPassword: 'pass'
+      }, {user: 'whatupdave', pass: 'password'}, ret));
+
+      macro.status(422, ret);
+      macro.validation(1, [['newPassword', 'insecure']], ret);
+
+      describe('should not update user doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('users/whatupdave', ret));
+
+        it('should have old password', function () {
+          assert.equal(ret.body.password, '$2a$10$zLU2YvIuUH8EiGgqOc0g.exDZXobiXlfLy20yifWnuD/7xqvaxl3y');
+        });
+      });
+    });
+
+    describe('Updating authenticated user password', function () {
+      var ret = {}, token;
+
+      before(macro.patch('/user', {
+        newPassword: 'newpassword'
+      }, {user: 'whatupdave', pass: 'password'}, ret, function () {
+        token = ret.body.token;
+      }));
+
+      macro.status(200, ret);
+
+      it('should return the user', function () {
+        assert.equal(ret.body._id, 'users/whatupdave');
+        assert.equal(ret.body.username, 'whatupdave');
+        assert.equal(ret.body.fullname, 'Dave Newman');
+        assert.equal(ret.body.email, 'dave@snappyco.de');
+        assert.equal(ret.body.type, 'user');
+        assert.isTrue(ret.body.verified);
+      });
+
+      it('should return the token', function () {
+        assert.isString(ret.body.token);
+      });
+
+      it('should not retun password', function () {
+        assert.isUndefined(ret.body.password);
+      });
+
+      it('should not return access token', function () {
+        assert.isUndefined(ret.body.access_token);
+      });
+
+      describe('should update user doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('users/whatupdave', ret));
+
+        it('should have updated the password', function () {
+          assert.notEqual(ret.body.password, '$2a$10$zLU2YvIuUH8EiGgqOc0g.exDZXobiXlfLy20yifWnuD/7xqvaxl3y');
+        });
+
+        it('should not have verification token', function () {
+          assert.isUndefined(ret.body.verification_token);
+          assert.isUndefined(ret.body.verify_new_email);
+        });
+      });
+
+      describe('should have the access token in redis', function () {
+        var ret = {};
+
+        before(function (done) {
+          redis.get('confy_' + token, function (err, body) {
+            if (err) return done(err);
+
+            ret.body = body;
+            done();
+          });
+        });
+
+        it('and it should return the user', function () {
+          body = JSON.parse(ret.body);
+
+          assert.equal(body._id, 'users/whatupdave');
+          assert.equal(body.username, 'whatupdave');
+          assert.equal(body.fullname, 'Dave Newman');
+          assert.equal(body.email, 'dave@snappyco.de');
+          assert.equal(body.type, 'user');
+          assert.isTrue(body.verified);
+        });
+      });
+
+      describe('and counting redis keys', macro.redis(5, 'five'));
+
+      describe('and authenticating using new password', function () {
+        var ret = {};
+
+        before(macro.get('/user', {user: 'whatupdave', pass: 'newpassword'}, ret));
+
+        macro.status(200, ret);
+
+        it('should return the user', function () {
+          assert.equal(ret.body._id, 'users/whatupdave');
+          assert.equal(ret.body.username, 'whatupdave');
+          assert.equal(ret.body.fullname, 'Dave Newman');
+          assert.equal(ret.body.email, 'dave@snappyco.de');
+          assert.equal(ret.body.type, 'user');
+          assert.isTrue(ret.body.verified);
+        });
+      });
+
+      describe('and authenticating using old password', function () {
+        var ret = {};
+
+        before(macro.get('/user', {user: 'whatupdave', pass: 'password'}, ret));
+
+        macro.status(401, ret);
+
+        it('should return bad credentials', function () {
+          assert.deepEqual(ret.body, {'message':'Bad credentials'});
+        });
+      });
     });
   });
 };
