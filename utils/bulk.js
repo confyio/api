@@ -58,7 +58,7 @@ module.exports = function (app) {
     return { docs: [org, team] };
   };
 
-  app.bulk.user = function (user) {
+  app.bulk.user = function (user, docs) {
     user.password = app.bulk.cryptPass(user.password);
     user.type = 'user';
     user._id = 'users/' + user.username;
@@ -69,6 +69,10 @@ module.exports = function (app) {
 
     var tmp = app.bulk.org(org, user);
     tmp.docs.unshift(user);
+
+    if (docs) {
+      tmp.docs = tmp.docs.concat(docs);
+    }
 
     return tmp;
   };

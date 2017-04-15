@@ -129,6 +129,7 @@ require('./teams/projects')(macro);
 require('./teams/members/add')(macro);
 require('./teams/members/list')(macro);
 require('./teams/members/remove')(macro);
+require('./teams/members/invite')(macro);
 require('./envs/delete')(macro);
 require('./projects/delete')(macro);
 require('./teams/delete')(macro);

@@ -56,6 +56,17 @@ module.exports = function (macro) {
       macro.validation(1, [['user', 'invalid']], ret);
     });
 
+    describe('Adding member to team with invalid user email', function () {
+      var ret = {};
+
+      before(macro.post('/orgs/fire-size/teams/dev-gods/member', {
+        user: 'invalid@email'
+      }, {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(422, ret);
+      macro.validation(1, [['user', 'invalid']], ret);
+    });
+
     describe('Adding member to team', function () {
       var ret = {};
 
@@ -112,11 +123,106 @@ module.exports = function (macro) {
       });
     });
 
+    describe('Adding member to team with non-existent email', function () {
+      var ret = {};
+
+      before(macro.post('/orgs/confyio/teams/consultants/member', {
+        user: 'jksmith@gmail.com', random: 'u2e83'
+      }, {user: 'pksunkara', pass: 'password'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return the team doc', function () {
+        assert.equal(ret.body._id, 'orgs/confyio/teams/consultants');
+        assert.equal(ret.body.name, 'Consultants');
+        assert.equal(ret.body.description, 'Consultants will have restricted access to the projects');
+        assert.equal(ret.body.org, 'confyio');
+        assert.equal(ret.body.type, 'team');
+      });
+
+      it('should not return random fields', function () {
+        assert.isUndefined(ret.body.random);
+      });
+
+      it('should return users array', function () {
+        assert.deepEqual(ret.body.users, ['pksunkara', 'whatupdave', 'vanstee']);
+      });
+
+      describe('should not update the team doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/teams/consultants', ret));
+
+        it('should have not have new user in users list', function () {
+          assert.lengthOf(Object.keys(ret.body.users), 3);
+        });
+      });
+
+      describe('should not update the org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio', ret));
+
+        it('should not increment the count for the user', function () {
+          assert.lengthOf(Object.keys(ret.body.users), 5);
+        });
+      });
+
+      describe('should update the project doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/confyio/projects/knowledge-base', ret));
+
+        it('should increment the count for the user', function () {
+          assert.lengthOf(Object.keys(ret.body.users), 3);
+        });
+      });
+
+      describe('should create an invite doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('invites/jksmith@gmail.com', ret));
+
+        it('should have the correct team information', function () {
+          assert.equal(ret.body.org, 'orgs/confyio');
+          assert.equal(ret.body.team, 'orgs/confyio/teams/consultants');
+        });
+      });
+    });
+
     describe('Adding already member to team', function () {
       var ret = {};
 
       before(macro.post('/orgs/fire-size/teams/dev-gods/member', {
         user: 'jsmith', random: 'u2e83'
+      }, {user: 'jsmith', pass: 'secret'}, ret));
+
+      macro.status(200, ret);
+
+      it('should return the team doc', function () {
+        assert.equal(ret.body._id, 'orgs/fire-size/teams/dev-gods');
+        assert.equal(ret.body.name, 'Dev Gods');
+        assert.equal(ret.body.description, 'Main product developers');
+        assert.equal(ret.body.org, 'fire-size');
+        assert.equal(ret.body.type, 'team');
+      });
+
+      describe('should not update the org doc and it', function () {
+        var ret = {};
+
+        before(macro.doc('orgs/fire-size', ret));
+
+        it('should not increment the count for the user', function () {
+          assert.equal(ret.body.users['jsmith'], 2);
+        });
+      });
+    });
+
+    describe('Adding already member to team with user email', function () {
+      var ret = {};
+
+      before(macro.post('/orgs/fire-size/teams/dev-gods/member', {
+        user: 'johnsmith@gmail.com'
       }, {user: 'jsmith', pass: 'secret'}, ret));
 
       macro.status(200, ret);

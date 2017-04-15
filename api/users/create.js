@@ -1,11 +1,44 @@
 var crypto = require('crypto')
-  , validator = require('validator');
+  , validator = require('validator')
+  , addUserInDB = require('../teams/members').addUserInDB;
 
 module.exports = function (app, db) {
+
+  var insertUser = function (news, docs, req, res, next) {
+    db.bulk(app.bulk.user(req.body, docs), {all_or_nothing: true, new_edits: false}, function (err, body) {
+      if (err) return next(err);
+
+      if (news) {
+        app.mail.list('news', req.body, app.errors.capture());
+      }
+
+      app.analytics.identify({
+        userId: req.body.username,
+        traits: {
+          name: req.body.fullname,
+          username: req.body.username,
+          email: req.body.email
+        }
+      });
+
+      app.mail.verification(req.body.email, req.body, app.errors.capture());
+      app.analytics.track({ userId: req.body.username, event: 'Registered' });
+
+      app.utils.shield(req.body, ['password', 'verification_token']);
+      res.status(201);
+      res.json(req.body);
+    });
+  };
 
   // Create an user
   app.post('/user', function (req, res, next) {
     var news = req.body.news || false;
+
+    var missingError = function (err, docs) {
+      if (err.reason !== 'missing') return next(err);
+
+      return insertUser(news, docs, req, res, next);
+    };
 
     app.utils.permit(req, ['username', 'email', 'password', 'fullname']);
 
@@ -61,29 +94,31 @@ module.exports = function (app, db) {
           req.body.verified = true;
         }
 
-        // Insert user
-        db.bulk(app.bulk.user(req.body), {all_or_nothing: true, new_edits: false}, function (err, body) {
-          if (err) return next(err);
+        // Check for team invitations
+        db.get('invites/' + req.body.email, function (err, body) {
+          if (err) return missingError(err, []);
 
-          if (news) {
-            app.mail.list('news', req.body, app.errors.capture());
-          }
+          // Add to team
+          var inviteDoc = body;
+          inviteDoc._deleted = true;
 
-          app.analytics.identify({
-            userId: req.body.username,
-            traits: {
-              name: req.body.fullname,
-              username: req.body.username,
-              email: req.body.email
-            }
+          db.get(inviteDoc.org, function (err, body) {
+            if (err) return missingError(err, [inviteDoc]);
+
+            var org = body;
+
+            db.get(inviteDoc.team, function (err, body) {
+              if (err) return missingError(err, [inviteDoc]);
+
+              var team = body;
+
+              addUserInDB(app, db, req.body.username, org, team, function (err, docs) {
+                if (err) return next(err);
+
+                insertUser(news, docs.concat([inviteDoc, org, team]), req, res, next);
+              });
+            });
           });
-
-          app.mail.verification(req.body.email, req.body, app.errors.capture());
-          app.analytics.track({ userId: req.body.username, event: 'Registered' });
-
-          app.utils.shield(req.body, ['password', 'verification_token']);
-          res.status(201);
-          res.json(req.body);
         });
       });
     });

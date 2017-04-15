@@ -1,4 +1,4 @@
-# Confy [![Build Status](https://travis-ci.org/confyio/confy.svg)](https://travis-ci.org/confyio/confy)
+# Confy
 
 _Easily Manage your Software Credentials_
 

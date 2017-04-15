@@ -637,6 +637,18 @@ module.exports = {
       "password": "$2a$10$MLXwXjnxk1covLgEaAR8YeOQYQcO7INoHpfkIDi3.7pmwtsJbGw6.",
       "type": "user",
       "verified": true
+    },
+    {
+      "_id": "invites/jksmithorg@gmail.com",
+      "org": "orgs/none",
+      "team": "orgs/none/teams/owners",
+      "type": "invite"
+    },
+    {
+      "_id": "invites/jksmithteam@gmail.com",
+      "org": "orgs/confyio",
+      "team": "orgs/confyio/teams/none",
+      "type": "invite"
     }
   ]
 };
