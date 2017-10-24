@@ -13,16 +13,16 @@
   },
   "dependencies": {
     "analytics-node": "2.1.x",
-    "bcrypt": "0.8.x",
-    "body-parser": "1.15.x",
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
     "express": "^4.14.0",
-    "mailgun-js": "0.7.x",
-    "morgan": "1.7.x",
+    "mailgun-js": "^0.13.1",
+    "morgan": "^1.9.0",
     "nano": "git://github.com/dscape/nano#master",
     "raven": "^1.0.0-beta.1",
     "redis": "2.x.x",
     "request": "2.x.x",
-    "validator": "6.x.x"
+    "validator": "^9.1.0"
   },
   "devDependencies": {
     "mocha": "3.x.x",
