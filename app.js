@@ -62,7 +62,5 @@ if (!app.get('onpremise')) {
 // Error handling
 require('./utils/error')(app);
 
-// Start Server
-module.exports = app.listen(app.get('port'), function () {
-  console.log('Express server listening on port ' + app.get('port'));
-});
+// Export Server
+module.exports = app;

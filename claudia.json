@@ -1,0 +1,10 @@
+{
+  "lambda": {
+    "role": "confy-executor",
+    "name": "confy",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "0z3rw2k2ch"
+  }
+}

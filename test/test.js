@@ -10,6 +10,8 @@ var seed = require('./seed')
   , app = require('../app')
   , macro = require('./macro');
 
+app.listen(app.get('port'));
+
 describe('Database Connection', function () {
   it('should be successful', function (done) {
     nano.db.list(done);
