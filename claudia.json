@@ -1,10 +1,11 @@
 {
   "lambda": {
-    "role": "confy-executor",
+    "role": "lambda_basic_execution",
     "name": "confy",
-    "region": "us-east-1"
+    "region": "us-east-1",
+    "sharedRole": true
   },
   "api": {
-    "id": "0z3rw2k2ch"
+    "id": "r13avgksae"
   }
 }

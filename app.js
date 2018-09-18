@@ -64,3 +64,9 @@ require('./utils/error')(app);
 
 // Export Server
 module.exports = app;
+
+if (require.main === module) {
+  app.listen(app.get('port'), function () {
+    console.log('Started server');
+  });
+}

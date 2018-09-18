@@ -11,7 +11,9 @@ module.exports = function (app) {
     return url;
   });
 
-  if (app.get('env') !== 'test') {
+  if (app.get('env') === 'development') {
     app.use(morgan('dev'));
+  } else if (app.get('env') === 'production') {
+    app.use(morgan('tiny'));
   }
 };

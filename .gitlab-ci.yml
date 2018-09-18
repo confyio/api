@@ -10,7 +10,7 @@ after_script:
 stages:
   - test
 variables:
-  REDISCLOUD_URL: redis://redis:6379
+  REDIS_URL: redis://redis:6379
   CLOUDANT_URL: http://couchdb:5984
 test:
   stage: test

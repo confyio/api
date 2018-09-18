@@ -91,7 +91,7 @@ components:
         env_vars:
           - name: NODE_ENV
             static_val: production
-          - name: REDISCLOUD_URL
+          - name: REDIS_URL
             static_val: "redis://{{repl HostPrivateIpAddress \"DB\" \"redis\"}}:{{repl ContainerExposedPort \"DB\" \"redis\" \"6379\"}}"
           - name: CLOUDANT_URL
             static_val: "http://{{repl ConfigOption \"dbusername\"}}:{{repl ConfigOption \"dbpassword\"}}@{{repl HostPrivateIpAddress \"DB\" \"couchdb\"}}:5984"

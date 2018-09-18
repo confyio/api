@@ -1,5 +1,5 @@
 var crypto = require('crypto');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 var cryptPass = function (password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(10));

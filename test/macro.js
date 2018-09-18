@@ -1,7 +1,7 @@
 var request = require('request')
   , assert = require('chai').assert
   , nano = require('nano')(process.env.CLOUDANT_URL || 'http://localhost:5984')
-  , redis = require('redis').createClient({url: process.env.REDISCLOUD_URL || 'redis://localhost:6379'});
+  , redis = require('redis').createClient({url: process.env.REDIS_URL || 'redis://localhost:6379'});
 
 nano = nano.db.use('confy-test');
 

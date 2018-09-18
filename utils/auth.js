@@ -1,4 +1,4 @@
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 var authorization = function (req) {
   var auth = '', type = '', result = {

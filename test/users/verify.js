@@ -1,5 +1,5 @@
 var assert = require('chai').assert
-  , redis = require('redis').createClient({url: process.env.REDISCLOUD_URL || 'redis://localhost:6379'})
+  , redis = require('redis').createClient({url: process.env.REDIS_URL || 'redis://localhost:6379'})
   , request = require('request');
 
 module.exports = function (macro) {

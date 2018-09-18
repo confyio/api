@@ -16,10 +16,10 @@ module.exports = function (app) {
   app.set('addonkey', process.env.ADDON_KEY || 'thisisasampleherokuaddonpassword');
   app.set('addonsso', process.env.ADDON_SSO || 'thisisasampleherokuaddonsso_salt');
 
-  app.set('mailgun-key', process.env.MAILGUN_API_KEY || 'pksunkara.mailgun.org');
-  app.set('mailgun-domain', process.env.MAILGUN_DOMAIN || 'key-c8c8e282da3f62bb996e121d44ef0d9e');
+  app.set('mailgun-key', process.env.MAILGUN_API_KEY || 'key-c8c8e282da3f62bb996e121d44ef0d9e');
+  app.set('mailgun-domain', process.env.MAILGUN_DOMAIN || 'pksunkara.mailgun.org');
 
-  app.set('redis', process.env.REDISCLOUD_URL || 'redis://localhost:6379');
+  app.set('redis', process.env.REDIS_URL || 'redis://localhost:6379');
 
   app.set('sentry', process.env.SENTRY_URL || false);
   app.set('segment', process.env.SEGMENT_KEY || 'V9kSmRvA2aBD2azy4t8SKMdXACKBYtak');
