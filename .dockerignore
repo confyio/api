@@ -1,11 +1,7 @@
 .elasticbeanstalk
-.snyk
 .gitignore
-.travis.yml
 .gitlab-ci.yml
 addon-manifest.json
 node_modules
 npm-debug.log
-confy-web.sublime-project
-confy-web.sublime-workspace
 coverage
