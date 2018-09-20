@@ -2,7 +2,7 @@ var express = require('express')
   , nano = require('nano')
   , bodyParser = require('body-parser')
   , segment = require('analytics-node')
-  , raven = require('raven')
+  , sentry = require('@sentry/node')
   , redis = require('redis');
 
 var app = express();
@@ -15,11 +15,8 @@ if (!app.get('onpremise')) {
   app.analytics = new segment(app.get('segment'));
 
   // Setup Sentry
-  app.sentry = new raven.Client(app.get('sentry'));
-
-  if (app.get('env') === 'production') {
-    app.sentry.patchGlobal();
-  }
+  sentry.init({ dsn: app.get('sentry') });
+  app.use(sentry.Handlers.requestHandler());
 } else {
   app.analytics = {
     identify: function () {},
@@ -61,6 +58,34 @@ if (!app.get('onpremise')) {
 
 // Error handling
 require('./utils/error')(app);
+
+// Catch 404
+app.use(function (req, res, next) {
+  app.errors.notfound(res);
+});
+
+// Development error handler will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({
+      message: err.message,
+      error: err
+    });
+  });
+}
+
+if (!app.get('onpremise')) {
+  app.use(sentry.Handlers.errorHandler());
+}
+
+// Production error handler no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+  });
+});
 
 // Export Server
 module.exports = app;
