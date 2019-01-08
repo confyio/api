@@ -5,17 +5,30 @@ cache:
 services:
   - redis:alpine
   - couchdb:1.6
-after_script:
-  - bash <(curl -s https://codecov.io/bash) -t 2728d9bd-457e-4644-92f1-7e18ed948dff
 stages:
   - test
+  - deploy
 variables:
   REDIS_URL: redis://redis:6379
   CLOUDANT_URL: http://couchdb:5984
-test:
+mocha:
   stage: test
   script:
     - npm install
     - npm run cover
+  artifacts:
+    paths:
+      - coverage/
   tags:
     - docker
+pages:
+  stage: deploy
+  dependencies:
+    - mocha
+  script:
+    - mv coverage/lcov-report public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
