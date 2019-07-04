@@ -16,7 +16,7 @@ module.exports = function (app) {
   app.set('addonkey', process.env.ADDON_KEY || 'thisisasampleherokuaddonpassword');
   app.set('addonsso', process.env.ADDON_SSO || 'thisisasampleherokuaddonsso_salt');
 
-  app.set('mailgun-key', process.env.MAILGUN_API_KEY || 'key-c8c8e282da3f62bb996e121d44ef0d9e');
+  app.set('mailgun-key', process.env.MAILGUN_API_KEY || 'key-46ba87687614c4279460ab29a06e0450');
   app.set('mailgun-domain', process.env.MAILGUN_DOMAIN || 'pksunkara.mailgun.org');
 
   app.set('redis', process.env.REDIS_URL || 'redis://localhost:6379');

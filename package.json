@@ -12,12 +12,12 @@
     "node": ">=8"
   },
   "dependencies": {
-    "@sentry/node": "^4.0.3",
+    "@sentry/node": "^5.4.3",
     "analytics-node": "2.1.x",
-    "aws-serverless-express": "^3.3.5",
+    "aws-serverless-express": "^3.3.6",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
-    "express": "^4.16.4",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
     "mailgun-js": "^0.13.1",
     "morgan": "^1.9.1",
     "nano": "git://github.com/dscape/nano#master",
@@ -27,13 +27,12 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "claudia": "^5.3.0",
     "istanbul": "0.4.x",
     "mocha": "^5.2.0"
   },
   "scripts": {
     "start": "node app.js",
-    "deploy": "claudia update",
+    "deploy": "npx claudia update",
     "docker": "docker build -t confy/confy .",
     "test": "mocha --exit test/test.js",
     "cover": "istanbul cover _mocha -- --exit test/test.js"

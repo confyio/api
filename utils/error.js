@@ -1,3 +1,5 @@
+var sentry = require('@sentry/node');
+
 module.exports = function (app) {
   app.errors = {};
 
@@ -32,17 +34,11 @@ module.exports = function (app) {
   };
 
   // Capture error to sentry directly from callbacks
-  app.errors.capture = function (callback) {
-    if (callback && typeof callback !== 'function') {
-      callback = null;
-    }
-
+  app.errors.capture = function () {
     return function (err, data) {
       if (!app.get('onpremise')) {
-        if (err) app.sentry.captureError(err);
+        if (err) sentry.captureException(err);
       }
-
-      if (callback) callback(err, data);
     };
   };
 };
