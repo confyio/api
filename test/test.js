@@ -23,12 +23,14 @@ describe('Database Creation', function () {
     var callback = this.callback;
 
     nano.db.get('confy-test', function (err) {
-      if (err && err.reason == 'no_db_file') {
+      if (err && err.reason == 'Database does not exist.') {
         return nano.db.create('confy-test', done);
       }
 
       nano.db.destroy('confy-test', function (err) {
-        if (!err) nano.db.create('confy-test', done);
+        if (!err) {
+          nano.db.create('confy-test', done);
+        }
       })
     });
   });
@@ -159,7 +161,7 @@ describe('Database Destruction', function () {
 
     it('should return error', function (done) {
       nano.db.get('confy-test', function (err) {
-        assert.equal(err.reason, 'no_db_file');
+        assert.equal(err.reason, 'Database does not exist.');
         done();
       });
     });

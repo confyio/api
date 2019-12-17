@@ -1,0 +1,16 @@
+version: '3.7'
+networks:
+  default:
+    name: confy
+services:
+  confy-couchdb:
+    image: couchdb:latest
+    container_name: confy-couchdb
+    restart: always
+    ports:
+      - '5984:5984'
+    volumes:
+      - 'confy-db:/opt/couchdb/data'
+volumes:
+  confy-db:
+    name: confy-db

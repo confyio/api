@@ -35,7 +35,7 @@ var creating = function () {
 };
 
 nano.db.get(dbname, function (err) {
-  if (err && err.reason == 'no_db_file') {
+  if (err && err.reason == 'Database does not exist.') {
     return creating();
   }
 
